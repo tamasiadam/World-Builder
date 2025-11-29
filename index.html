@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASTRAL - World Builder</title>
+    <title>ASTRAL - Lorekeeper's Codex</title>
 
-    <!-- React & ReactDOM -->
     <script
       crossorigin
       src="https://unpkg.com/react@18/umd/react.development.js"
@@ -14,182 +13,300 @@
       crossorigin
       src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
     ></script>
-
-    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- D3.js for Mindmap -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Google Fonts (Fallback for 'Love') -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap"
       rel="stylesheet"
     />
 
     <style>
-      @font-face {
-        font-family: "Love";
-        src: url("Love.ttf") format("truetype"); /* Tries to find local file */
-      }
-
       :root {
-        --color-bg: #1a1b26;
-        --color-card: #24283b;
-        --color-accent: #5c2a2a; /* The dark red from your image */
-        --color-text: #c0caf5;
+        --color-bg-dark: #0f1016;
+        --color-panel: rgba(20, 21, 31, 0.7);
         --color-gold: #e0af68;
+        --color-gold-dim: #8f7a54;
+        --color-starlight: #c0caf5;
+        --color-magic: #7aa2f7;
+        --shadow-glow: 0 0 15px rgba(224, 175, 104, 0.15);
       }
 
       body {
-        background-color: var(--color-bg);
-        color: var(--color-text);
-        font-family: "Playfair Display", serif;
+        background-color: var(--color-bg-dark);
+        color: var(--color-starlight);
+        font-family: "Cormorant Garamond", serif;
+        overflow-x: hidden;
       }
 
-      h1,
-      h2,
-      h3,
+      /* --- ASTROLOGY BACKGROUND --- */
+      .star-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+          ellipse at bottom,
+          #1b2735 0%,
+          #090a0f 100%
+        );
+        z-index: -1;
+      }
+      .stars {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(
+            2px 2px at 20px 30px,
+            #eee,
+            rgba(0, 0, 0, 0)
+          ),
+          radial-gradient(2px 2px at 40px 70px, #fff, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0, 0, 0, 0)),
+          radial-gradient(2px 2px at 90px 40px, #fff, rgba(0, 0, 0, 0));
+        background-size: 200px 200px;
+        animation: twinkle 10s infinite linear;
+        opacity: 0.6;
+      }
+      @keyframes twinkle {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(-200px);
+        }
+      }
+
+      /* --- UI COMPONENTS --- */
       .brand-font {
-        font-family: "Love", "Cinzel", serif; /* Priority: Love -> Cinzel -> Serif */
+        font-family: "Cinzel", serif;
       }
 
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
+      .glass-panel {
+        background: var(--color-panel);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(224, 175, 104, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
       }
-      ::-webkit-scrollbar-track {
-        background: var(--color-bg);
-      }
-      ::-webkit-scrollbar-thumb {
-        background: var(--color-accent);
-        border-radius: 4px;
+      .glass-panel:hover {
+        border-color: rgba(224, 175, 104, 0.4);
+        box-shadow: var(--shadow-glow);
       }
 
-      .input-std {
-        background-color: rgba(0, 0, 0, 0.3);
-        border: 1px solid #414868;
-        color: #c0caf5;
+      .input-astral {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--color-gold-dim);
+        color: var(--color-starlight);
         padding: 0.5rem;
+        font-family: "Cormorant Garamond", serif;
+        font-size: 1.1rem;
         width: 100%;
         outline: none;
-        transition: border-color 0.2s;
+        transition: all 0.3s;
       }
-      .input-std:focus {
+      .input-astral:focus {
         border-color: var(--color-gold);
+        box-shadow: 0 0 8px rgba(224, 175, 104, 0.3);
+        background: rgba(0, 0, 0, 0.5);
       }
 
-      .btn-primary {
-        background-color: var(--color-accent);
-        color: white;
+      .btn-gold {
+        background: linear-gradient(
+          135deg,
+          rgba(92, 42, 42, 0.8) 0%,
+          rgba(59, 27, 27, 0.9) 100%
+        );
+        color: var(--color-gold);
+        border: 1px solid var(--color-gold);
         padding: 0.5rem 1.5rem;
-        border-radius: 2px;
         font-family: "Cinzel", serif;
         text-transform: uppercase;
         letter-spacing: 1px;
-        transition: filter 0.2s;
-      }
-      .btn-primary:hover {
-        filter: brightness(1.2);
-      }
-
-      .btn-secondary {
-        border: 1px solid var(--color-accent);
-        color: var(--color-text);
-        padding: 0.4rem 0.8rem;
-        font-family: "Cinzel", serif;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        transition: all 0.2s;
-        background: transparent;
+        transition: all 0.3s;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        justify-content: center;
         cursor: pointer;
       }
-      .btn-secondary:hover {
-        background: var(--color-accent);
-        color: white;
-        border-color: var(--color-gold);
+      .btn-gold:hover {
+        background: linear-gradient(
+          135deg,
+          rgba(122, 58, 58, 0.9) 0%,
+          rgba(92, 42, 42, 0.9) 100%
+        );
+        box-shadow: var(--shadow-glow);
+        text-shadow: 0 0 5px var(--color-gold);
       }
 
-      .toast-enter {
-        transform: translateY(100%);
-        opacity: 0;
+      .btn-ghost {
+        border: 1px solid var(--color-gold-dim);
+        color: var(--color-starlight);
+        padding: 0.4rem 1rem;
+        font-family: "Cinzel", serif;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.8rem;
+        background: transparent;
+        transition: all 0.3s;
       }
-      .toast-enter-active {
-        transform: translateY(0);
-        opacity: 1;
-        transition: all 300ms ease-out;
+      .btn-ghost:hover {
+        border-color: var(--color-gold);
+        color: var(--color-gold);
+        background: rgba(224, 175, 104, 0.1);
+      }
+
+      .nav-link {
+        color: var(--color-gold-dim);
+        font-family: "Cinzel", serif;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding-bottom: 5px;
+        position: relative;
+        transition: color 0.3s;
+        font-size: 0.85rem;
+      }
+      .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0%;
+        height: 1px;
+        background: var(--color-gold);
+        transition: width 0.3s;
+      }
+      .nav-link:hover,
+      .nav-link.active {
+        color: var(--color-gold);
+      }
+      .nav-link.active::after {
+        width: 100%;
+      }
+
+      /* Wiki Specifics */
+      .wiki-link {
+        color: var(--color-magic);
+        text-decoration: none;
+        border-bottom: 1px dotted var(--color-magic);
+        transition: all 0.3s;
+        cursor: pointer;
+        display: inline-block;
+      }
+      .wiki-link:hover {
+        color: #fff;
+        text-shadow: 0 0 8px var(--color-magic);
+        border-bottom-style: solid;
+      }
+
+      /* RICH TEXT STYLES IN WIKI */
+      .rich-content h1 {
+        font-family: "Cinzel", serif;
+        font-size: 2rem;
+        color: var(--color-gold);
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(224, 175, 104, 0.3);
+      }
+      .rich-content h2 {
+        font-family: "Cinzel", serif;
+        font-size: 1.5rem;
+        color: var(--color-starlight);
+        margin-top: 1.2rem;
+        margin-bottom: 0.5rem;
+      }
+      .rich-content h3 {
+        font-family: "Cinzel", serif;
+        font-size: 1.2rem;
+        color: var(--color-magic);
+        margin-top: 1rem;
+        margin-bottom: 0.2rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+      .rich-content b,
+      .rich-content strong {
+        color: var(--color-gold);
+        font-weight: 700;
+      }
+      .rich-content i,
+      .rich-content em {
+        color: var(--color-magic);
+        font-style: italic;
+      }
+      .rich-content p {
+        margin-bottom: 1rem;
+        line-height: 1.8;
+      }
+      .rich-content ul {
+        list-style: disc;
+        margin-left: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .rich-content blockquote {
+        border-left: 2px solid var(--color-gold);
+        padding-left: 1rem;
+        font-style: italic;
+        color: var(--color-gold-dim);
+        margin: 1rem 0;
+      }
+      .rich-content .align-center {
+        text-align: center;
+      }
+      .rich-content .align-right {
+        text-align: right;
+      }
+      .rich-content .align-left {
+        text-align: left;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #090a0f;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--color-gold-dim);
+        border-radius: 3px;
+      }
+
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: var(--color-gold);
+      }
+
+      .status-deceased {
+        filter: grayscale(100%) contrast(120%);
+      }
+
+      /* Map Markers */
+      .map-marker {
+        transition: transform 0.2s;
+      }
+      .map-marker:hover {
+        transform: scale(1.2);
+        z-index: 50;
       }
     </style>
   </head>
   <body>
+    <div class="star-bg"><div class="stars"></div></div>
     <div id="root"></div>
 
     <script type="text/babel">
-      const { useState, useEffect, useRef, useMemo } = React;
+      const { useState, useEffect, useMemo, useRef } = React;
 
       // --- ICONS ---
-      const IconUser = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-          <circle cx="12" cy="7" r="4" />
-        </svg>
-      );
-      const IconMap = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" />
-          <line x1="8" y1="2" x2="8" y2="18" />
-          <line x1="16" y1="6" x2="16" y2="22" />
-        </svg>
-      );
-      const IconNetwork = () => (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="16" y="16" width="6" height="6" rx="1" />
-          <rect x="2" y="16" width="6" height="6" rx="1" />
-          <rect x="9" y="2" width="6" height="6" rx="1" />
-          <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
-          <path d="M12 12V8" />
-        </svg>
-      );
       const IconTrash = () => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -221,6 +338,144 @@
         >
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      );
+      const IconSearch = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+      );
+      const IconBook = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+      );
+      const IconStars = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+          <path d="M5 3v4" />
+          <path d="M9 5H5" />
+          <path d="M19 19v2" />
+          <path d="M21 19h-2" />
+        </svg>
+      );
+      const IconSkull = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M5.12 11.23A8 8 0 0 1 19 9c0 3-1 6-3 8a6 6 0 0 1-12 0c-2-2-3-5-3-8l4.12 2.23Z" />
+          <path d="M8 12h8" />
+          <path d="M10 16v2" />
+          <path d="M14 16v2" />
+        </svg>
+      );
+      const IconBold = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M14 12a4 4 0 0 0 0-8H6v8" />
+          <path d="M15 20a4 4 0 0 0 0-8H6v8Z" />
+        </svg>
+      );
+      const IconItalic = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="19" y1="4" x2="10" y2="4" />
+          <line x1="14" y1="20" x2="5" y2="20" />
+          <line x1="15" y1="4" x2="9" y2="20" />
+        </svg>
+      );
+      const IconAlignLeft = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="17" y1="10" x2="3" y2="10" />
+          <line x1="21" y1="6" x2="3" y2="6" />
+          <line x1="21" y1="14" x2="3" y2="14" />
+          <line x1="17" y1="18" x2="3" y2="18" />
+        </svg>
+      );
+      const IconAlignCenter = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="18" y1="10" x2="6" y2="10" />
+          <line x1="21" y1="6" x2="3" y2="6" />
+          <line x1="21" y1="14" x2="3" y2="14" />
+          <line x1="18" y1="18" x2="6" y2="18" />
         </svg>
       );
       const IconDownload = () => (
@@ -257,11 +512,28 @@
           <line x1="12" y1="3" x2="12" y2="15" />
         </svg>
       );
-      const IconCheck = () => (
+
+      const IconMapPin = () => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
+          <circle cx="12" cy="10" r="3" fill="var(--color-bg-dark)" />
+        </svg>
+      );
+      const IconCastle = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -269,98 +541,736 @@
           strokeLinecap="round"
           strokeLinejoin="round"
         >
-          <polyline points="20 6 9 17 4 12" />
+          <path d="M21 20v-8.5l-2.12-2.12a2 2 0 0 0-2.83 0L14 11.5v-6l-2-2-2 2v6L7.95 9.38a2 2 0 0 0-2.83 0L3 11.5V20h18Z" />
+          <path d="M8 15h8" />
+          <path d="M8 20v-5" />
+          <path d="M16 20v-5" />
+        </svg>
+      );
+      const IconMountain = () => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
         </svg>
       );
 
+      // --- UTILS ---
+      const getImageSrc = (imgData) => {
+        if (!imgData) return "";
+        return typeof imgData === "string" ? imgData : imgData.url;
+      };
+
+      const getShapeClass = (shape) => {
+        switch (shape) {
+          case "portrait":
+            return "aspect-[2/3]";
+          case "landscape":
+            return "aspect-video";
+          case "banner":
+            return "aspect-[3/1]";
+          default:
+            return "aspect-square";
+        }
+      };
+
+      const getImageStyle = (imgData) => {
+        if (!imgData || typeof imgData === "string")
+          return { objectFit: "cover", width: "100%", height: "100%" };
+
+        // If "contain" is set, strictly use contain (shows whole image, adds bars)
+        if (imgData.fit === "contain") {
+          return {
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            objectPosition: "center",
+          };
+        }
+
+        // Otherwise (Cover mode), apply transforms
+        return {
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          objectPosition: "center",
+          transform: `translate(${imgData.x || 0}px, ${
+            imgData.y || 0
+          }px) scale(${imgData.scale || 1})`,
+          transformOrigin: "center",
+        };
+      };
+
       // --- COMPONENTS ---
 
-      // 1. MINDMAP COMPONENT (D3)
-      const MindMap = ({ characters, locations }) => {
-        const svgRef = useRef(null);
-        const gRef = useRef(null); // Container for zoom
+      // 1. RICH TEXT EDITOR
+      const RichTextEditor = ({ value, onChange, placeholder }) => {
+        const textareaRef = useRef(null);
+        const insertTag = (tagStart, tagEnd) => {
+          const el = textareaRef.current;
+          if (!el) return;
+          const start = el.selectionStart;
+          const end = el.selectionEnd;
+          const text = el.value;
+          const before = text.substring(0, start);
+          const selection = text.substring(start, end);
+          const after = text.substring(end);
+          const newText = before + tagStart + selection + tagEnd + after;
+          onChange(newText);
+          setTimeout(() => {
+            el.focus();
+            el.setSelectionRange(
+              start + tagStart.length,
+              end + tagStart.length
+            );
+          }, 0);
+        };
+
+        return (
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-1 bg-black/40 p-1 border border-[#e0af68]/20 rounded-t">
+              <button
+                type="button"
+                onClick={() => insertTag("<b>", "</b>")}
+                className="btn-ghost px-2 py-1 text-xs"
+                title="Bold"
+              >
+                <IconBold />
+              </button>
+              <button
+                type="button"
+                onClick={() => insertTag("<i>", "</i>")}
+                className="btn-ghost px-2 py-1 text-xs"
+                title="Italic"
+              >
+                <IconItalic />
+              </button>
+              <div className="w-[1px] h-6 bg-[#e0af68]/20 mx-1"></div>
+              <button
+                type="button"
+                onClick={() => insertTag("<h1>", "</h1>")}
+                className="btn-ghost px-2 py-1 text-xs"
+                title="Header 1"
+              >
+                H1
+              </button>
+              <button
+                type="button"
+                onClick={() => insertTag("<h2>", "</h2>")}
+                className="btn-ghost px-2 py-1 text-xs"
+                title="Header 2"
+              >
+                H2
+              </button>
+              <button
+                type="button"
+                onClick={() => insertTag("<h3>", "</h3>")}
+                className="btn-ghost px-2 py-1 text-xs"
+                title="Header 3"
+              >
+                H3
+              </button>
+              <div className="w-[1px] h-6 bg-[#e0af68]/20 mx-1"></div>
+              <button
+                type="button"
+                onClick={() => insertTag('<div class="align-left">', "</div>")}
+                className="btn-ghost px-2 py-1 text-xs"
+              >
+                <IconAlignLeft />
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  insertTag('<div class="align-center">', "</div>")
+                }
+                className="btn-ghost px-2 py-1 text-xs"
+              >
+                <IconAlignCenter />
+              </button>
+            </div>
+            <textarea
+              ref={textareaRef}
+              className="input-astral h-48 resize-none font-mono text-sm leading-relaxed"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder={placeholder || "Inscribe lore here..."}
+            ></textarea>
+            <div className="text-[10px] text-[#8f7a54] flex justify-between">
+              {" "}
+              <span>HTML allowed</span>{" "}
+              <span>Use &lt;br/&gt; for line breaks inside divs</span>{" "}
+            </div>
+          </div>
+        );
+      };
+
+      // 2. IMAGE PICKER
+      const ImagePicker = ({ value, onChange, placeholder = "Image URL" }) => {
+        const [isDragging, setIsDragging] = useState(false);
+        const [startPos, setStartPos] = useState({ x: 0, y: 0 });
+
+        const imgState =
+          typeof value === "object" && value !== null
+            ? value
+            : {
+                url: value || "",
+                x: 0,
+                y: 0,
+                scale: 1,
+                shape: "square",
+                fit: "cover",
+              };
+
+        const handleMouseDown = (e) => {
+          e.preventDefault();
+          if (imgState.fit === "contain") return;
+          setIsDragging(true);
+          setStartPos({
+            x: e.clientX - (imgState.x || 0),
+            y: e.clientY - (imgState.y || 0),
+          });
+        };
+
+        const handleMouseMove = (e) => {
+          if (!isDragging) return;
+          const newX = e.clientX - startPos.x;
+          const newY = e.clientY - startPos.y;
+          onChange({ ...imgState, x: newX, y: newY });
+        };
+
+        const handleMouseUp = () => setIsDragging(false);
 
         useEffect(() => {
-          if (!svgRef.current) return;
+          if (isDragging) {
+            window.addEventListener("mouseup", handleMouseUp);
+            window.addEventListener("mousemove", handleMouseMove);
+          } else {
+            window.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("mousemove", handleMouseMove);
+          }
+          return () => {
+            window.removeEventListener("mouseup", handleMouseUp);
+            window.removeEventListener("mousemove", handleMouseMove);
+          };
+        }, [isDragging, startPos]);
 
-          // Prepare Data
+        return (
+          <div className="flex flex-col gap-3">
+            {/* Controls */}
+            <div className="flex flex-wrap gap-2 justify-between items-center">
+              <div className="flex gap-1">
+                {["square", "portrait", "landscape", "banner"].map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => onChange({ ...imgState, shape: s })}
+                    className={`px-2 py-1 text-[10px] uppercase border transition-colors ${
+                      imgState.shape === s
+                        ? "border-[#e0af68] text-[#e0af68] bg-[#e0af68]/10"
+                        : "border-[#8f7a54] text-[#8f7a54] hover:border-[#e0af68]"
+                    }`}
+                  >
+                    {s.slice(0, 1).toUpperCase() + s.slice(1)}
+                  </button>
+                ))}
+              </div>
+              {/* Fit Toggle */}
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => onChange({ ...imgState, fit: "cover" })}
+                  title="Fill the box (crops edges). Allows dragging and zooming."
+                  className={`px-2 py-1 text-[10px] uppercase border transition-colors ${
+                    !imgState.fit || imgState.fit === "cover"
+                      ? "border-[#7aa2f7] text-[#7aa2f7] bg-[#7aa2f7]/10"
+                      : "border-[#8f7a54] text-[#8f7a54]"
+                  }`}
+                >
+                  Standard (Crop)
+                </button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      ...imgState,
+                      fit: "contain",
+                      x: 0,
+                      y: 0,
+                      scale: 1,
+                    })
+                  }
+                  title="Show whole image (adds bars). No dragging."
+                  className={`px-2 py-1 text-[10px] uppercase border transition-colors ${
+                    imgState.fit === "contain"
+                      ? "border-[#7aa2f7] text-[#7aa2f7] bg-[#7aa2f7]/10"
+                      : "border-[#8f7a54] text-[#8f7a54]"
+                  }`}
+                >
+                  Whole (Fit)
+                </button>
+              </div>
+            </div>
+
+            <div
+              className={`w-full ${getShapeClass(
+                imgState.shape
+              )} bg-[#090A0F] border border-[#e0af68]/30 shadow-inner relative overflow-hidden ${
+                imgState.fit !== "contain" ? "cursor-move" : "cursor-default"
+              } group`}
+              onMouseDown={handleMouseDown}
+            >
+              {imgState.url ? (
+                <img
+                  src={imgState.url}
+                  style={getImageStyle(imgState)}
+                  draggable={false}
+                />
+              ) : (
+                <div className="absolute inset-0 flex flex-col gap-2 items-center justify-center text-[#8f7a54]/50">
+                  <IconStars />
+                  <span className="text-xs uppercase tracking-widest">
+                    Projection
+                  </span>
+                </div>
+              )}
+              {imgState.fit !== "contain" && (
+                <div className="absolute top-2 left-2 text-[9px] bg-black/60 px-1 rounded text-white/70 pointer-events-none uppercase border border-white/10">
+                  Drag to Position
+                </div>
+              )}
+            </div>
+
+            <input
+              type="text"
+              className="input-astral text-sm"
+              placeholder={placeholder}
+              value={imgState.url}
+              onChange={(e) => onChange({ ...imgState, url: e.target.value })}
+            />
+
+            {/* Scale Slider */}
+            {(!imgState.fit || imgState.fit === "cover") && (
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-[#e0af68] uppercase tracking-widest">
+                  Size
+                </span>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="3"
+                  step="0.05"
+                  value={imgState.scale || 1}
+                  onChange={(e) =>
+                    onChange({ ...imgState, scale: parseFloat(e.target.value) })
+                  }
+                  className="flex-1 accent-[#e0af68] h-1 bg-[#8f7a54] rounded-lg appearance-none cursor-pointer"
+                />
+                <span className="text-[10px] text-[#8f7a54] w-8 text-right">
+                  {Math.round((imgState.scale || 1) * 100)}%
+                </span>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // 3. WORLD MAP COMPONENT
+      const WorldMap = ({ mapData, onUpdate }) => {
+        const [showPresets, setShowPresets] = useState(false);
+        const [activeMarker, setActiveMarker] = useState(null);
+        const [draggingId, setDraggingId] = useState(null);
+
+        const presetMaps = [
+          {
+            name: "Green World",
+            url: "https://via.placeholder.com/1000x600/2a4a35/5c8c6f?text=Forest+Realm",
+          },
+          {
+            name: "Sepia Charts",
+            url: "https://via.placeholder.com/1000x600/3b2d22/d4b483?text=Old+World+Map",
+          },
+          {
+            name: "Oceanic",
+            url: "https://via.placeholder.com/1000x600/101b33/406080?text=Archipelago",
+          },
+        ];
+
+        const handleMapClick = (e) => {
+          if (activeMarker || draggingId) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * 100;
+          const y = ((e.clientY - rect.top) / rect.height) * 100;
+          const newMarker = {
+            id: Date.now(),
+            x,
+            y,
+            label: "New Location",
+            icon: "pin",
+            color: "#e0af68",
+          };
+          onUpdate({
+            ...mapData,
+            markers: [...(mapData.markers || []), newMarker],
+          });
+          setActiveMarker(newMarker);
+        };
+
+        const updateMarker = (field, val) => {
+          if (!activeMarker) return;
+          const updated = { ...activeMarker, [field]: val };
+          setActiveMarker(updated);
+          onUpdate({
+            ...mapData,
+            markers: mapData.markers.map((m) =>
+              m.id === activeMarker.id ? updated : m
+            ),
+          });
+        };
+
+        const deleteMarker = () => {
+          if (!activeMarker) return;
+          onUpdate({
+            ...mapData,
+            markers: mapData.markers.filter((m) => m.id !== activeMarker.id),
+          });
+          setActiveMarker(null);
+        };
+
+        const handleMarkerDragStart = (e, mId) => {
+          e.stopPropagation();
+          setDraggingId(mId);
+        };
+        const handleMarkerDragEnd = (e) => {
+          e.stopPropagation();
+          setDraggingId(null);
+        };
+        const handleMapMouseMove = (e) => {
+          if (draggingId) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            onUpdate({
+              ...mapData,
+              markers: mapData.markers.map((m) =>
+                m.id === draggingId ? { ...m, x, y } : m
+              ),
+            });
+          }
+        };
+
+        const getMarkerIcon = (iconName, color) => {
+          const style = { color, filter: `drop-shadow(0 0 5px ${color})` };
+          switch (iconName) {
+            case "castle":
+              return (
+                <div style={style}>
+                  <IconCastle />
+                </div>
+              );
+            case "mountain":
+              return (
+                <div style={style}>
+                  <IconMountain />
+                </div>
+              );
+            case "skull":
+              return (
+                <div style={style}>
+                  <IconSkull />
+                </div>
+              );
+            default:
+              return (
+                <div style={style}>
+                  <IconMapPin />
+                </div>
+              );
+          }
+        };
+
+        return (
+          <div className="h-[calc(100vh-140px)] flex flex-col md:flex-row gap-4">
+            <div className="flex-1 glass-panel relative rounded overflow-hidden flex flex-col">
+              <div className="absolute top-4 left-4 z-20 flex gap-2">
+                <input
+                  type="text"
+                  className="input-astral text-xs w-64 bg-black/80 backdrop-blur"
+                  placeholder="Paste Map Image URL..."
+                  value={mapData.url || ""}
+                  onChange={(e) =>
+                    onUpdate({ ...mapData, url: e.target.value })
+                  }
+                />
+                <div className="relative">
+                  <button
+                    onClick={() => setShowPresets(!showPresets)}
+                    className="btn-gold text-xs h-full"
+                  >
+                    Presets
+                  </button>
+                  {showPresets && (
+                    <div className="absolute top-full left-0 mt-1 bg-[#0f1016] border border-[#e0af68]/30 p-2 w-40 z-30 shadow-lg">
+                      {presetMaps.map((pm) => (
+                        <button
+                          key={pm.name}
+                          onClick={() => {
+                            onUpdate({ ...mapData, url: pm.url });
+                            setShowPresets(false);
+                          }}
+                          className="block w-full text-left text-xs text-[#8f7a54] hover:text-[#e0af68] py-2 border-b border-[#e0af68]/10 last:border-0"
+                        >
+                          {pm.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div
+                className="flex-1 bg-[#090A0F] relative overflow-hidden cursor-crosshair"
+                onClick={handleMapClick}
+                onMouseMove={handleMapMouseMove}
+                onMouseUp={handleMarkerDragEnd}
+              >
+                {mapData.url ? (
+                  <img
+                    src={mapData.url}
+                    className="w-full h-full object-contain pointer-events-none select-none"
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-[#8f7a54]/30">
+                    <IconMapPin size={64} />
+                    <span className="mt-4 uppercase tracking-widest">
+                      No Chart Loaded
+                    </span>
+                  </div>
+                )}
+                {(mapData.markers || []).map((marker) => (
+                  <div
+                    key={marker.id}
+                    className={`absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer group map-marker ${
+                      activeMarker?.id === marker.id ? "z-40 scale-125" : "z-10"
+                    }`}
+                    style={{ top: `${marker.y}%`, left: `${marker.x}%` }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveMarker(marker);
+                    }}
+                    onMouseDown={(e) => handleMarkerDragStart(e, marker.id)}
+                  >
+                    {getMarkerIcon(marker.icon, marker.color)}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 bg-black/80 px-2 py-0.5 rounded text-[10px] whitespace-nowrap text-[#e0af68] opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-[#e0af68]/30">
+                      {marker.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {activeMarker && (
+              <div className="w-full md:w-64 glass-panel p-4 flex flex-col gap-4 animate-fade-in border-l border-[#e0af68]/30">
+                <div className="flex justify-between items-center border-b border-[#e0af68]/20 pb-2">
+                  <h3 className="text-[#e0af68] brand-font">Marker Details</h3>
+                  <button
+                    onClick={() => setActiveMarker(null)}
+                    className="text-[#8f7a54] hover:text-white"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase text-[#8f7a54]">
+                    Label
+                  </label>
+                  <input
+                    className="input-astral text-sm"
+                    value={activeMarker.label}
+                    onChange={(e) => updateMarker("label", e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase text-[#8f7a54]">
+                    Icon
+                  </label>
+                  <div className="flex gap-2 mt-1">
+                    {["pin", "castle", "mountain", "skull"].map((ic) => (
+                      <button
+                        key={ic}
+                        onClick={() => updateMarker("icon", ic)}
+                        className={`p-2 rounded border ${
+                          activeMarker.icon === ic
+                            ? "border-[#e0af68] bg-[#e0af68]/20 text-[#e0af68]"
+                            : "border-[#8f7a54]/30 text-[#8f7a54]"
+                        }`}
+                      >
+                        {getMarkerIcon(ic, "currentColor")}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase text-[#8f7a54]">
+                    Color
+                  </label>
+                  <input
+                    type="color"
+                    className="w-full h-8 bg-transparent border border-[#8f7a54] mt-1 cursor-pointer"
+                    value={activeMarker.color}
+                    onChange={(e) => updateMarker("color", e.target.value)}
+                  />
+                </div>
+                <div className="mt-auto pt-4">
+                  <button
+                    onClick={deleteMarker}
+                    className="w-full border border-red-900/50 text-red-400 hover:bg-red-900/20 py-1 px-3 rounded text-xs uppercase flex items-center justify-center gap-2"
+                  >
+                    <IconTrash size={14} /> Remove Marker
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // 4. MINDMAP (Preserved)
+      const MindMap = ({ characters, locations, events, groups }) => {
+        const svgRef = useRef(null);
+        useEffect(() => {
+          if (!svgRef.current || !window.d3) return;
           const nodes = [
             ...characters.map((c) => ({
-              id: c.id,
+              id: `char_${c.id}`,
+              originalId: c.id,
               name: c.name,
               type: "character",
-              img: c.image,
+              img: getImageSrc(c.image),
+              group: 1,
             })),
             ...locations.map((l) => ({
-              id: l.id,
+              id: `loc_${l.id}`,
+              originalId: l.id,
               name: l.name,
               type: "location",
-              img: l.image,
+              img: getImageSrc(l.image),
+              group: 2,
+            })),
+            ...events.map((e) => ({
+              id: `evt_${e.id}`,
+              originalId: e.id,
+              name: e.name,
+              type: "event",
+              img: getImageSrc(e.image),
+              group: 3,
+            })),
+            ...groups.map((g) => ({
+              id: `grp_${g.id}`,
+              originalId: g.id,
+              name: g.name,
+              type: "faction",
+              img: getImageSrc(g.image),
+              group: 4,
             })),
           ];
-
+          const findNodeId = (id, typePrefix) => {
+            const found = nodes.find((n) => n.id === `${typePrefix}_${id}`);
+            return found ? found.id : null;
+          };
           const links = [];
-
-          // Link Characters to relationships
           characters.forEach((c) => {
-            c.relationships.forEach((r) => {
-              const target = nodes.find((n) => n.id === r.targetId);
-              if (target) {
-                links.push({ source: c.id, target: target.id, label: r.type });
-              }
-            });
-
-            // Link Character to Home/Location if it exists
+            const sourceId = `char_${c.id}`;
+            if (c.relationships)
+              c.relationships.forEach((r) => {
+                const targetId = findNodeId(r.targetId, "char");
+                if (targetId)
+                  links.push({
+                    source: sourceId,
+                    target: targetId,
+                    label: r.type,
+                  });
+              });
             if (c.countryId) {
-              const loc = nodes.find((n) => n.id === c.countryId);
-              if (loc)
-                links.push({ source: c.id, target: loc.id, label: "Lives in" });
+              const targetId = findNodeId(c.countryId, "loc");
+              if (targetId)
+                links.push({
+                  source: sourceId,
+                  target: targetId,
+                  label: "Home",
+                });
             }
           });
-
-          // Link Locations to Residents
           locations.forEach((l) => {
-            l.residents.forEach((resId) => {
-              const char = nodes.find((n) => n.id === resId);
-              const exists = links.find(
-                (link) =>
-                  (link.source === l.id && link.target === char.id) ||
-                  (link.source === char.id && link.target === l.id)
-              );
-              if (char && !exists)
-                links.push({
-                  source: l.id,
-                  target: char.id,
-                  label: "Resident",
-                });
-            });
+            const sourceId = `loc_${l.id}`;
+            if (l.residents)
+              l.residents.forEach((resId) => {
+                const targetId = findNodeId(resId, "char");
+                if (targetId) {
+                  const exists = links.find(
+                    (li) =>
+                      (li.source === sourceId && li.target === targetId) ||
+                      (li.source === targetId && li.target === sourceId)
+                  );
+                  if (!exists)
+                    links.push({
+                      source: sourceId,
+                      target: targetId,
+                      label: "Resident",
+                    });
+                }
+              });
           });
-
-          // --- D3 Setup ---
+          events.forEach((e) => {
+            const sourceId = `evt_${e.id}`;
+            if (e.locationId) {
+              const targetId = findNodeId(e.locationId, "loc");
+              if (targetId)
+                links.push({
+                  source: sourceId,
+                  target: targetId,
+                  label: "Occurred At",
+                });
+            }
+            if (e.participants)
+              e.participants.forEach((pid) => {
+                const targetId = findNodeId(pid, "char");
+                if (targetId)
+                  links.push({
+                    source: sourceId,
+                    target: targetId,
+                    label: "Involved",
+                  });
+              });
+          });
+          groups.forEach((g) => {
+            const sourceId = `grp_${g.id}`;
+            if (g.members)
+              g.members.forEach((mid) => {
+                const targetId = findNodeId(mid, "char");
+                if (targetId)
+                  links.push({
+                    source: sourceId,
+                    target: targetId,
+                    label: "Member",
+                  });
+              });
+          });
           const svg = d3.select(svgRef.current);
-
-          // Clear previous *content* but keep the zoom grouping structure if we can, or just clear all
-          // Simpler to clear all for React re-renders in this simple use case
           svg.selectAll("*").remove();
-
-          // Add Group for Zooming
           const g = svg.append("g");
-          gRef.current = g;
-
-          const width = svgRef.current.clientWidth;
-          const height = svgRef.current.clientHeight;
-
-          // Zoom Behavior
+          const width = svgRef.current.clientWidth || 800;
+          const height = svgRef.current.clientHeight || 600;
           const zoom = d3
             .zoom()
             .scaleExtent([0.1, 4])
-            .on("zoom", (event) => {
-              g.attr("transform", event.transform);
-            });
-
-          svg.call(zoom).on("dblclick.zoom", null); // Disable double click to zoom
-
-          // Simulation
+            .on("zoom", (event) => g.attr("transform", event.transform));
+          svg.call(zoom).on("dblclick.zoom", null);
           const simulation = d3
             .forceSimulation(nodes)
             .force(
@@ -372,20 +1282,16 @@
             )
             .force("charge", d3.forceManyBody().strength(-400))
             .force("center", d3.forceCenter(width / 2, height / 2))
-            .force("collide", d3.forceCollide().radius(40));
-
-          // Render Lines
+            .force("collide", d3.forceCollide().radius(60));
           const link = g
             .append("g")
             .selectAll("line")
             .data(links)
             .enter()
             .append("line")
-            .attr("stroke", "#5c2a2a")
-            .attr("stroke-opacity", 0.6)
-            .attr("stroke-width", 2);
-
-          // Render Nodes Container
+            .attr("stroke", "#7aa2f7")
+            .attr("stroke-opacity", 0.3)
+            .attr("stroke-width", 1);
           const node = g
             .append("g")
             .selectAll("g")
@@ -400,376 +1306,1029 @@
                 .on("drag", dragged)
                 .on("end", dragended)
             );
-
-          // Node Circles
+          const getColor = (t) => {
+            if (t === "character") return "#e0af68";
+            if (t === "location") return "#7aa2f7";
+            if (t === "event") return "#f7768e";
+            if (t === "faction") return "#bb9af7";
+            return "#fff";
+          };
           node
             .append("circle")
-            .attr("r", 25)
-            .attr("fill", (d) =>
-              d.type === "character" ? "#24283b" : "#4a2c2c"
-            )
-            .attr("stroke", "#e0af68")
-            .attr("stroke-width", 2);
-
-          // Images
+            .attr("r", 28)
+            .attr("fill", (d) => getColor(d.type))
+            .attr("opacity", 0.15);
+          node
+            .append("circle")
+            .attr("r", 24)
+            .attr("fill", "#090A0F")
+            .attr("stroke", (d) => getColor(d.type))
+            .attr("stroke-width", 1.5);
           node
             .append("clipPath")
             .attr("id", (d) => "clip-" + d.id)
             .append("circle")
-            .attr("r", 25);
-
+            .attr("r", 24);
           node
             .append("image")
-            .attr(
-              "xlink:href",
-              (d) => d.img || "https://via.placeholder.com/50"
-            )
-            .attr("x", -25)
-            .attr("y", -25)
-            .attr("width", 50)
-            .attr("height", 50)
+            .attr("xlink:href", (d) => d.img || "")
+            .attr("x", -24)
+            .attr("y", -24)
+            .attr("width", 48)
+            .attr("height", 48)
             .attr("clip-path", (d) => "url(#clip-" + d.id + ")");
-
-          // Labels
           node
             .append("text")
             .text((d) => d.name)
             .attr("x", 0)
-            .attr("y", 40)
+            .attr("y", 38)
             .attr("text-anchor", "middle")
-            .attr("fill", "#c0caf5")
+            .attr("fill", (d) => getColor(d.type))
             .style("font-size", "12px")
             .style("font-family", "Cinzel")
-            .style("pointer-events", "none"); // Let clicks pass through to node
-
-          // Link Labels
-          const linkLabel = g
-            .append("g")
-            .selectAll("text")
-            .data(links)
-            .enter()
-            .append("text")
-            .text((d) => d.label)
-            .attr("text-anchor", "middle")
-            .attr("fill", "#666")
-            .style("font-size", "10px");
-
+            .style("text-shadow", "0 2px 4px black");
           simulation.on("tick", () => {
             link
               .attr("x1", (d) => d.source.x)
               .attr("y1", (d) => d.source.y)
               .attr("x2", (d) => d.target.x)
               .attr("y2", (d) => d.target.y);
-
             node.attr("transform", (d) => `translate(${d.x},${d.y})`);
-
-            linkLabel
-              .attr("x", (d) => (d.source.x + d.target.x) / 2)
-              .attr("y", (d) => (d.source.y + d.target.y) / 2);
           });
-
           function dragstarted(event, d) {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
             d.fy = d.y;
-            d3.select(this).attr("cursor", "grabbing");
           }
-
           function dragged(event, d) {
             d.fx = event.x;
             d.fy = event.y;
           }
-
           function dragended(event, d) {
             if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;
-            d3.select(this).attr("cursor", "grab");
           }
-
           return () => simulation.stop();
-        }, [characters, locations]);
-
+        }, [characters, locations, events, groups]);
         return (
-          <div className="w-full h-full bg-black/20 rounded-lg overflow-hidden border border-[#5c2a2a] relative">
-            <div className="absolute top-2 left-2 z-10 text-xs text-gray-500 pointer-events-none p-2 bg-black/50 rounded">
-              Scroll to Zoom • Drag background to Pan
-            </div>
-            <svg ref={svgRef} className="w-full h-[600px]"></svg>
+          <div className="w-full h-[calc(100vh-140px)] glass-panel rounded-lg overflow-hidden relative">
+            {" "}
+            <div
+              className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle, #7aa2f7 1px, transparent 1px)",
+                backgroundSize: "40px 40px",
+              }}
+            ></div>{" "}
+            <svg ref={svgRef} className="w-full h-full"></svg>{" "}
           </div>
         );
       };
 
-      // 2. MAIN APP
+      // 5. LOREKEEPER'S WIKI
+      const LoreWiki = ({
+        characters,
+        locations,
+        items,
+        events,
+        groups,
+        creatures,
+      }) => {
+        const [searchTerm, setSearchTerm] = useState("");
+        const [selectedType, setSelectedType] = useState("all");
+        const [activeEntry, setActiveEntry] = useState(null);
+        const allData = useMemo(
+          () => [
+            ...characters.map((c) => ({ ...c, dataType: "Character" })),
+            ...locations.map((l) => ({ ...l, dataType: "Location" })),
+            ...items.map((i) => ({ ...i, dataType: "Item" })),
+            ...events.map((e) => ({ ...e, dataType: "Event" })),
+            ...groups.map((g) => ({ ...g, dataType: "Faction" })),
+            ...creatures.map((c) => ({ ...c, dataType: "Creature" })),
+          ],
+          [characters, locations, items, events, groups, creatures]
+        );
+        const filteredData = allData
+          .filter((d) => {
+            const matchesSearch = (d.name || "")
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase());
+            const matchesType =
+              selectedType === "all" || d.dataType === selectedType;
+            return matchesSearch && matchesType;
+          })
+          .sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+        const findName = (id, type) => {
+          if (type === "char")
+            return characters.find((c) => c.id === id)?.name || "Unknown";
+          if (type === "loc")
+            return locations.find((l) => l.id === id)?.name || "Unknown";
+          return "Unknown";
+        };
+        const handleLinkClick = (id, type) => {
+          const found = allData.find(
+            (d) =>
+              d.id === id &&
+              ((type === "char" && d.dataType === "Character") ||
+                (type === "loc" && d.dataType === "Location"))
+          );
+          if (found) setActiveEntry(found);
+        };
+        const getTypeColor = (type) => {
+          if (type === "Character") return "text-[#e0af68]";
+          if (type === "Location") return "text-[#7aa2f7]";
+          if (type === "Event") return "text-[#f7768e]";
+          if (type === "Faction") return "text-[#bb9af7]";
+          if (type === "Creature") return "text-[#9ece6a]";
+          return "text-[#8f7a54]";
+        };
+        return (
+          <div className="flex flex-col md:flex-row h-[calc(100vh-140px)] gap-8">
+            <div className="glass-panel w-full md:w-1/3 lg:w-1/4 flex flex-col h-full rounded-lg overflow-hidden border border-[#e0af68]/30">
+              <div className="p-4 bg-[#0f1016]/50 border-b border-[#e0af68]/20">
+                <div className="relative mb-3">
+                  <IconSearch
+                    className="absolute top-2.5 left-2 text-[#8f7a54]"
+                    size={14}
+                  />
+                  <input
+                    className="input-astral pl-8 text-sm rounded-full bg-black/20"
+                    placeholder="Search archives..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center text-[10px] uppercase tracking-wider text-[#8f7a54]">
+                  {" "}
+                  {[
+                    "all",
+                    "Character",
+                    "Location",
+                    "Item",
+                    "Event",
+                    "Faction",
+                    "Creature",
+                  ].map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setSelectedType(t)}
+                      className={`hover:text-[#e0af68] transition-colors px-1 ${
+                        selectedType === t
+                          ? "text-[#e0af68] font-bold border-b border-[#e0af68]"
+                          : ""
+                      }`}
+                    >
+                      {" "}
+                      {t === "all" ? "All" : t}{" "}
+                    </button>
+                  ))}{" "}
+                </div>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                {filteredData.map((entry) => (
+                  <div
+                    key={entry.dataType + entry.id}
+                    onClick={() => setActiveEntry(entry)}
+                    className={`p-3 rounded cursor-pointer flex items-center gap-3 transition-all ${
+                      activeEntry?.id === entry.id &&
+                      activeEntry?.dataType === entry.dataType
+                        ? "bg-[#e0af68]/10 border border-[#e0af68]/30 text-[#e0af68]"
+                        : "text-[#8f7a54] hover:bg-white/5"
+                    }`}
+                  >
+                    {" "}
+                    <div className="w-8 h-8 rounded border border-[#e0af68]/30 overflow-hidden flex-shrink-0 bg-black/40 relative">
+                      {" "}
+                      {entry.image && entry.image.url && (
+                        <img
+                          src={getImageSrc(entry.image)}
+                          className={`w-full h-full object-cover ${
+                            entry.status === "Deceased" ? "status-deceased" : ""
+                          }`}
+                        />
+                      )}{" "}
+                      {entry.status === "Deceased" && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <IconSkull />
+                        </div>
+                      )}{" "}
+                    </div>{" "}
+                    <div>
+                      {" "}
+                      <div
+                        className={`font-serif text-lg leading-none ${
+                          activeEntry?.id === entry.id
+                            ? "text-[#e0af68]"
+                            : "text-[#c0caf5]"
+                        } ${
+                          entry.status === "Deceased"
+                            ? "line-through decoration-red-900/50"
+                            : ""
+                        }`}
+                      >
+                        {entry.name}
+                      </div>{" "}
+                      <div
+                        className={`text-[9px] uppercase tracking-widest opacity-70 mt-1 ${getTypeColor(
+                          entry.dataType
+                        )}`}
+                      >
+                        {entry.dataType}
+                      </div>{" "}
+                    </div>{" "}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="glass-panel flex-1 h-full overflow-y-auto relative rounded-lg p-8 custom-scrollbar">
+              {activeEntry ? (
+                <div className="max-w-4xl mx-auto animate-fade-in">
+                  <div className="border-b border-[#e0af68]/50 mb-8 pb-4 flex flex-col md:flex-row justify-between items-end gap-4">
+                    {" "}
+                    <div>
+                      {" "}
+                      <h2 className="text-5xl brand-font text-[#e0af68] drop-shadow-lg flex items-center gap-3">
+                        {" "}
+                        {activeEntry.name}{" "}
+                        {activeEntry.status === "Deceased" && (
+                          <span
+                            className="text-red-900 text-3xl"
+                            title="Deceased"
+                          >
+                            †
+                          </span>
+                        )}{" "}
+                      </h2>{" "}
+                      <span
+                        className={`text-sm uppercase tracking-[0.3em] ${getTypeColor(
+                          activeEntry.dataType
+                        )}`}
+                      >
+                        {activeEntry.dataType}
+                      </span>{" "}
+                    </div>{" "}
+                  </div>
+                  <div className="md:float-right md:ml-8 md:mb-8 w-full md:w-80 bg-[#0f1016]/60 border border-[#e0af68]/40 p-1 shadow-[0_0_20px_rgba(0,0,0,0.5)] mb-6 backdrop-blur-md rounded-sm">
+                    <div className="border border-[#e0af68]/20 p-1 bg-black/20">
+                      {" "}
+                      <div
+                        className={`${getShapeClass(
+                          activeEntry.image?.shape
+                        )} overflow-hidden relative border border-[#e0af68]/10`}
+                      >
+                        {" "}
+                        {activeEntry.image?.url ? (
+                          <img
+                            src={getImageSrc(activeEntry.image)}
+                            style={getImageStyle(activeEntry.image)}
+                            className={
+                              activeEntry.status === "Deceased"
+                                ? "status-deceased"
+                                : ""
+                            }
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[#8f7a54]/30">
+                            <IconBook size={40} />
+                          </div>
+                        )}{" "}
+                      </div>{" "}
+                    </div>
+                    <div className="p-4 text-lg font-serif space-y-3 text-[#c0caf5]">
+                      {activeEntry.dataType === "Character" && (
+                        <>
+                          {" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Status
+                            </span>{" "}
+                            <span
+                              className={
+                                activeEntry.status === "Deceased"
+                                  ? "text-red-500"
+                                  : "text-[#c0caf5]"
+                              }
+                            >
+                              {activeEntry.status || "Alive"}
+                            </span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Gender
+                            </span>{" "}
+                            <span>{activeEntry.gender || "-"}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Race
+                            </span>{" "}
+                            <span>{activeEntry.race}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Class
+                            </span>{" "}
+                            <span>{activeEntry.class}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Age
+                            </span>{" "}
+                            <span>{activeEntry.age}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Home
+                            </span>{" "}
+                            {activeEntry.countryId ? (
+                              <span
+                                className="wiki-link"
+                                onClick={() =>
+                                  handleLinkClick(activeEntry.countryId, "loc")
+                                }
+                              >
+                                {findName(activeEntry.countryId, "loc")}
+                              </span>
+                            ) : (
+                              <span className="text-gray-500 italic">
+                                Wandering
+                              </span>
+                            )}
+                          </div>{" "}
+                          <div className="pt-2">
+                            {" "}
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest block mb-1">
+                              Affiliations
+                            </span>{" "}
+                            <div className="flex flex-wrap gap-1">
+                              {" "}
+                              {groups.filter((g) =>
+                                (g.members || []).includes(activeEntry.id)
+                              ).length > 0 ? (
+                                groups
+                                  .filter((g) =>
+                                    (g.members || []).includes(activeEntry.id)
+                                  )
+                                  .map((g) => (
+                                    <span
+                                      key={g.id}
+                                      className="text-xs border border-[#bb9af7] text-[#bb9af7] px-1 rounded cursor-pointer hover:bg-[#bb9af7] hover:text-black"
+                                      onClick={() =>
+                                        setActiveEntry({
+                                          ...g,
+                                          dataType: "Faction",
+                                        })
+                                      }
+                                    >
+                                      {g.name}
+                                    </span>
+                                  ))
+                              ) : (
+                                <span className="text-gray-500 text-xs italic">
+                                  None
+                                </span>
+                              )}{" "}
+                            </div>{" "}
+                          </div>{" "}
+                          {activeEntry.stats && (
+                            <div className="grid grid-cols-3 gap-2 pt-3 mt-2 border-t border-[#e0af68]/20">
+                              {" "}
+                              {Object.keys(activeEntry.stats).map((s) => (
+                                <div
+                                  key={s}
+                                  className="bg-[#e0af68]/5 text-center p-1 border border-[#e0af68]/10"
+                                >
+                                  {" "}
+                                  <div className="text-[10px] text-[#e0af68] uppercase">
+                                    {s}
+                                  </div>{" "}
+                                  <div className="font-bold text-[#c0caf5]">
+                                    {activeEntry.stats[s]}
+                                  </div>{" "}
+                                </div>
+                              ))}{" "}
+                            </div>
+                          )}{" "}
+                        </>
+                      )}
+                      {activeEntry.dataType === "Item" && (
+                        <>
+                          {" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Type
+                            </span>{" "}
+                            <span>{activeEntry.type}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Element
+                            </span>{" "}
+                            <span className="text-[#e0af68]">
+                              {activeEntry.element || "Physical"}
+                            </span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Rarity
+                            </span>{" "}
+                            <span className="text-[#e0af68]">
+                              {activeEntry.rarity}
+                            </span>
+                          </div>{" "}
+                          <div className="grid grid-cols-2 gap-3 pt-3 text-center text-sm">
+                            {" "}
+                            <div className="bg-[#e0af68]/10 p-1 border border-[#e0af68]/20">
+                              ATK <br />
+                              <span className="text-white text-lg">
+                                {activeEntry.stats?.atk}
+                              </span>
+                            </div>{" "}
+                            <div className="bg-[#e0af68]/10 p-1 border border-[#e0af68]/20">
+                              DEF <br />
+                              <span className="text-white text-lg">
+                                {activeEntry.stats?.def}
+                              </span>
+                            </div>{" "}
+                          </div>{" "}
+                        </>
+                      )}
+                      {activeEntry.dataType === "Location" && (
+                        <>
+                          {" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Biome
+                            </span>{" "}
+                            <span>{activeEntry.biome}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Kin
+                            </span>{" "}
+                            <span>{activeEntry.species}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Pop.
+                            </span>{" "}
+                            <span>
+                              {activeEntry.residents
+                                ? activeEntry.residents.length
+                                : 0}
+                            </span>
+                          </div>{" "}
+                        </>
+                      )}
+                      {activeEntry.dataType === "Event" && (
+                        <>
+                          {" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Era
+                            </span>{" "}
+                            <span>{activeEntry.era}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Location
+                            </span>{" "}
+                            {activeEntry.locationId ? (
+                              <span
+                                className="wiki-link"
+                                onClick={() =>
+                                  handleLinkClick(activeEntry.locationId, "loc")
+                                }
+                              >
+                                {findName(activeEntry.locationId, "loc")}
+                              </span>
+                            ) : (
+                              <span className="italic">Unknown</span>
+                            )}{" "}
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Involved
+                            </span>{" "}
+                            <span>{activeEntry.participants?.length || 0}</span>
+                          </div>{" "}
+                        </>
+                      )}
+                      {activeEntry.dataType === "Creature" && (
+                        <>
+                          {" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Type
+                            </span>{" "}
+                            <span>{activeEntry.type}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Threat
+                            </span>{" "}
+                            <span className="text-red-400">
+                              {activeEntry.threat}
+                            </span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Habitat
+                            </span>{" "}
+                            {activeEntry.habitatId ? (
+                              <span
+                                className="wiki-link"
+                                onClick={() =>
+                                  handleLinkClick(activeEntry.habitatId, "loc")
+                                }
+                              >
+                                {findName(activeEntry.habitatId, "loc")}
+                              </span>
+                            ) : (
+                              <span className="italic">Anywhere</span>
+                            )}{" "}
+                          </div>{" "}
+                          {activeEntry.stats && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                              {" "}
+                              <div className="bg-red-900/20 border border-red-500/20 p-1 text-center">
+                                <span className="text-[10px] text-red-400 block">
+                                  HP
+                                </span>
+                                {activeEntry.stats.hp}
+                              </div>{" "}
+                              <div className="bg-red-900/20 border border-red-500/20 p-1 text-center">
+                                <span className="text-[10px] text-red-400 block">
+                                  DMG
+                                </span>
+                                {activeEntry.stats.dmg}
+                              </div>{" "}
+                            </div>
+                          )}{" "}
+                        </>
+                      )}
+                      {activeEntry.dataType === "Faction" && (
+                        <>
+                          {" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Type
+                            </span>{" "}
+                            <span>{activeEntry.type}</span>
+                          </div>{" "}
+                          <div className="flex justify-between border-b border-[#e0af68]/20 pb-1">
+                            <span className="text-[#8f7a54] text-sm uppercase tracking-widest">
+                              Members
+                            </span>{" "}
+                            <span>{activeEntry.members?.length || 0}</span>
+                          </div>{" "}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="prose prose-invert max-w-none text-[#c0caf5] text-lg leading-relaxed">
+                    {" "}
+                    <h3 className="brand-font text-2xl text-[#e0af68] mb-4 flex items-center gap-2">
+                      <span className="h-[1px] w-8 bg-[#e0af68]"></span> Lore
+                    </h3>{" "}
+                    <div
+                      className="rich-content"
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          activeEntry.desc ||
+                          "<p class='italic opacity-50'>The scrolls say nothing of this yet...</p>",
+                      }}
+                    ></div>{" "}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-[#8f7a54]/40">
+                  {" "}
+                  <IconBook size={80} strokeWidth={0.5} />{" "}
+                  <p className="brand-font text-3xl mt-4">Select a Chronicle</p>{" "}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      };
+
+      // MAIN APP
       const App = () => {
-        const [view, setView] = useState("characters"); // characters, locations, mindmap
+        const [view, setView] = useState("wiki");
         const [characters, setCharacters] = useState([]);
         const [locations, setLocations] = useState([]);
-
-        // Edit States
+        const [items, setItems] = useState([]);
+        const [events, setEvents] = useState([]);
+        const [groups, setGroups] = useState([]);
+        const [creatures, setCreatures] = useState([]);
+        const [worldMap, setWorldMap] = useState({ url: "", markers: [] });
         const [editingChar, setEditingChar] = useState(null);
         const [editingLoc, setEditingLoc] = useState(null);
+        const [editingItem, setEditingItem] = useState(null);
+        const [editingEvent, setEditingEvent] = useState(null);
+        const [editingGroup, setEditingGroup] = useState(null);
+        const [editingCreature, setEditingCreature] = useState(null);
+        const [isDirty, setIsDirty] = useState(false);
+        const fileInputRef = useRef(null);
 
-        // System States
-        const [lastSaved, setLastSaved] = useState(null);
-        const [isDirty, setIsDirty] = useState(false); // Dirty relative to FILE EXPORT
-
-        // Initial Load
         useEffect(() => {
-          const savedChars = localStorage.getItem("astral_chars");
-          const savedLocs = localStorage.getItem("astral_locs");
-          if (savedChars) setCharacters(JSON.parse(savedChars));
-          if (savedLocs) setLocations(JSON.parse(savedLocs));
-          setLastSaved(new Date());
+          const sC = localStorage.getItem("astral_chars");
+          const sL = localStorage.getItem("astral_locs");
+          const sI = localStorage.getItem("astral_items");
+          const sE = localStorage.getItem("astral_events");
+          const sG = localStorage.getItem("astral_groups");
+          const sCr = localStorage.getItem("astral_creatures");
+          const sMap = localStorage.getItem("astral_map");
+          if (sC) setCharacters(JSON.parse(sC));
+          if (sL) setLocations(JSON.parse(sL));
+          if (sI) setItems(JSON.parse(sI));
+          if (sE) setEvents(JSON.parse(sE));
+          if (sG) setGroups(JSON.parse(sG));
+          if (sCr) setCreatures(JSON.parse(sCr));
+          if (sMap) setWorldMap(JSON.parse(sMap));
+          if (!sC && !sL && !sI) {
+            setLocations([
+              {
+                id: 1,
+                name: "Crystal Spire",
+                biome: "Arcane Void",
+                species: "Constructs",
+                residents: [101],
+                desc: "A floating tower in the endless void.",
+                image: { url: "", shape: "landscape" },
+              },
+            ]);
+            setCharacters([
+              {
+                id: 101,
+                name: "Eldric",
+                race: "Elf",
+                gender: "Male",
+                status: "Alive",
+                class: "Mage",
+                countryId: 1,
+                desc: "Keeper of the old ways.",
+                image: { url: "", shape: "portrait" },
+                stats: { str: 8, dex: 10, con: 10, int: 18, wis: 16, cha: 12 },
+              },
+            ]);
+          }
         }, []);
 
-        // AutoSave Effect (Immediate to LocalStorage)
         useEffect(() => {
-          if (characters.length > 0 || locations.length > 0) {
-            localStorage.setItem("astral_chars", JSON.stringify(characters));
-            localStorage.setItem("astral_locs", JSON.stringify(locations));
-            setLastSaved(new Date());
-            setIsDirty(true); // Mark as dirty for file export
-          }
-        }, [characters, locations]);
+          localStorage.setItem("astral_chars", JSON.stringify(characters));
+          localStorage.setItem("astral_locs", JSON.stringify(locations));
+          localStorage.setItem("astral_items", JSON.stringify(items));
+          localStorage.setItem("astral_events", JSON.stringify(events));
+          localStorage.setItem("astral_groups", JSON.stringify(groups));
+          localStorage.setItem("astral_creatures", JSON.stringify(creatures));
+          localStorage.setItem("astral_map", JSON.stringify(worldMap));
+          setIsDirty(true);
+          const timer = setTimeout(() => setIsDirty(false), 2000);
+          return () => clearTimeout(timer);
+        }, [characters, locations, items, events, groups, creatures, worldMap]);
 
-        // Warn on Exit if Dirty
-        useEffect(() => {
-          const handleBeforeUnload = (e) => {
-            if (isDirty) {
-              const message =
-                "You have unsaved changes that haven't been exported to a file. Are you sure you want to leave?";
-              e.returnValue = message;
-              return message;
-            }
-          };
-
-          window.addEventListener("beforeunload", handleBeforeUnload);
-          return () =>
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        }, [isDirty]);
-
-        // --- Handlers ---
-
-        const handleSaveChar = (char) => {
-          if (characters.find((c) => c.id === char.id)) {
-            setCharacters(characters.map((c) => (c.id === char.id ? char : c)));
-          } else {
-            setCharacters([...characters, char]);
-          }
-          setEditingChar(null);
+        const save = (setFn, list, item) => {
+          setFn((prev) =>
+            prev.find((i) => i.id === item.id)
+              ? prev.map((i) => (i.id === item.id ? item : i))
+              : [...prev, item]
+          );
+        };
+        const del = (setFn, list, id) => {
+          if (confirm("Banish this entry to the void?"))
+            setFn((prev) => prev.filter((i) => i.id !== id));
+        };
+        const updateCharacterGroups = (charId, selectedGroupIds) => {
+          setGroups((prevGroups) => {
+            return prevGroups.map((grp) => {
+              const hasMember = grp.members?.includes(charId);
+              const shouldHaveMember = selectedGroupIds.includes(grp.id);
+              if (hasMember && !shouldHaveMember)
+                return {
+                  ...grp,
+                  members: grp.members.filter((m) => m !== charId),
+                };
+              if (!hasMember && shouldHaveMember)
+                return { ...grp, members: [...(grp.members || []), charId] };
+              return grp;
+            });
+          });
         };
 
-        const handleDeleteChar = (id) => {
-          if (!confirm("Are you sure?")) return;
-          setCharacters(characters.filter((c) => c.id !== id));
-          setEditingChar(null);
-        };
-
-        const handleSaveLoc = (loc) => {
-          if (locations.find((l) => l.id === loc.id)) {
-            setLocations(locations.map((l) => (l.id === loc.id ? loc : l)));
-          } else {
-            setLocations([...locations, loc]);
-          }
-          setEditingLoc(null);
-        };
-
-        const handleDeleteLoc = (id) => {
-          if (!confirm("Are you sure?")) return;
-          setLocations(locations.filter((l) => l.id !== id));
-          setEditingLoc(null);
-        };
-
-        // --- File Export/Import ---
+        // Export Function
         const handleExport = () => {
-          const data = { characters, locations };
+          const data = {
+            characters,
+            locations,
+            items,
+            events,
+            groups,
+            creatures,
+            worldMap,
+          };
           const blob = new Blob([JSON.stringify(data, null, 2)], {
             type: "application/json",
           });
           const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `astral_world_${new Date()
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `astral_codex_${new Date()
             .toISOString()
             .slice(0, 10)}.json`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-          setIsDirty(false); // Reset dirty flag
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         };
 
-        const handleImport = (event) => {
-          const file = event.target.files[0];
+        // Import Function
+        const handleImport = (e) => {
+          const file = e.target.files[0];
           if (!file) return;
-
           const reader = new FileReader();
-          reader.onload = (e) => {
+          reader.onload = (event) => {
             try {
-              const data = JSON.parse(e.target.result);
-              if (data.characters) setCharacters(data.characters);
-              if (data.locations) setLocations(data.locations);
-              alert("World data loaded successfully!");
-              setIsDirty(false);
+              const data = JSON.parse(event.target.result);
+              if (
+                confirm("This will overwrite your current chronicle. Proceed?")
+              ) {
+                if (data.characters) setCharacters(data.characters);
+                if (data.locations) setLocations(data.locations);
+                if (data.items) setItems(data.items);
+                if (data.events) setEvents(data.events);
+                if (data.groups) setGroups(data.groups);
+                if (data.creatures) setCreatures(data.creatures);
+                if (data.worldMap) setWorldMap(data.worldMap);
+                alert("The archives have been restored.");
+              }
             } catch (err) {
-              alert("Error loading file: " + err.message);
+              alert("The scroll is corrupted or illegible.");
+              console.error(err);
             }
           };
           reader.readAsText(file);
-          event.target.value = "";
+          // Reset input
+          e.target.value = null;
         };
 
         return (
-          <div className="min-h-screen flex flex-col relative">
-            {/* Header */}
-            <header className="flex flex-col md:flex-row justify-between items-center px-8 py-6 border-b border-[#5c2a2a] bg-[#1a1b26] gap-4">
-              <div className="flex items-center gap-6">
-                <h1 className="text-5xl text-[#e0af68] tracking-widest brand-font">
+          <div className="min-h-screen flex flex-col font-serif relative">
+            <header className="px-8 py-5 flex items-center justify-between border-b border-[#e0af68]/20 bg-[#0f1016]/80 backdrop-blur-md sticky top-0 z-50">
+              <div className="flex items-center gap-4">
+                {" "}
+                <h1
+                  className="text-3xl lg:text-4xl text-[#e0af68] brand-font tracking-widest"
+                  style={{ textShadow: "0 0 10px rgba(224,175,104,0.3)" }}
+                >
                   ASTRAL
-                </h1>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleExport}
-                    className={`btn-secondary ${
-                      isDirty
-                        ? "animate-pulse border-yellow-500 text-yellow-500"
-                        : ""
-                    }`}
-                    title="Save to File"
-                  >
-                    <IconDownload /> {isDirty ? "Save *" : "Saved"}
-                  </button>
-                  <label
-                    className="btn-secondary cursor-pointer"
-                    title="Load from File"
-                  >
-                    <IconUpload /> Load
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept=".json"
-                      onChange={handleImport}
-                    />
-                  </label>
-                </div>
+                </h1>{" "}
+                <span className="h-6 w-[1px] bg-[#8f7a54] hidden sm:block"></span>{" "}
+                <span className="text-xs text-[#7aa2f7] uppercase tracking-[0.3em] hidden sm:block">
+                  Codex of the Stars
+                </span>{" "}
               </div>
-
-              <nav className="flex gap-4">
+              <nav className="flex gap-4 lg:gap-8 overflow-x-auto pb-1 max-w-[60vw]">
+                {" "}
                 <button
-                  onClick={() => {
-                    setView("characters");
-                    setEditingChar(null);
-                  }}
-                  className={`px-4 py-2 text-lg brand-font transition-all ${
-                    view === "characters"
-                      ? "bg-[#5c2a2a] text-white shadow-[0_0_10px_#5c2a2a]"
-                      : "hover:text-[#e0af68]"
-                  }`}
+                  onClick={() => setView("wiki")}
+                  className={`nav-link ${view === "wiki" ? "active" : ""}`}
                 >
-                  Characters
-                </button>
+                  Wiki
+                </button>{" "}
                 <button
-                  onClick={() => {
-                    setView("locations");
-                    setEditingLoc(null);
-                  }}
-                  className={`px-4 py-2 text-lg brand-font transition-all ${
-                    view === "locations"
-                      ? "bg-[#5c2a2a] text-white shadow-[0_0_10px_#5c2a2a]"
-                      : "hover:text-[#e0af68]"
-                  }`}
+                  onClick={() => setView("chars")}
+                  className={`nav-link ${view === "chars" ? "active" : ""}`}
                 >
-                  Locations
-                </button>
+                  Souls
+                </button>{" "}
+                <button
+                  onClick={() => setView("locs")}
+                  className={`nav-link ${view === "locs" ? "active" : ""}`}
+                >
+                  Realms
+                </button>{" "}
+                <button
+                  onClick={() => setView("events")}
+                  className={`nav-link ${view === "events" ? "active" : ""}`}
+                >
+                  Events
+                </button>{" "}
+                <button
+                  onClick={() => setView("groups")}
+                  className={`nav-link ${view === "groups" ? "active" : ""}`}
+                >
+                  Factions
+                </button>{" "}
+                <button
+                  onClick={() => setView("creatures")}
+                  className={`nav-link ${view === "creatures" ? "active" : ""}`}
+                >
+                  Bestiary
+                </button>{" "}
+                <button
+                  onClick={() => setView("items")}
+                  className={`nav-link ${view === "items" ? "active" : ""}`}
+                >
+                  Relics
+                </button>{" "}
+                <button
+                  onClick={() => setView("map")}
+                  className={`nav-link ${view === "map" ? "active" : ""}`}
+                >
+                  World Map
+                </button>{" "}
                 <button
                   onClick={() => setView("mindmap")}
-                  className={`px-4 py-2 text-lg brand-font transition-all ${
-                    view === "mindmap"
-                      ? "bg-[#5c2a2a] text-white shadow-[0_0_10px_#5c2a2a]"
-                      : "hover:text-[#e0af68]"
+                  className={`nav-link ${view === "mindmap" ? "active" : ""}`}
+                >
+                  Mind Map
+                </button>{" "}
+              </nav>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleExport}
+                  className="btn-ghost px-2 py-1 text-xs flex gap-1 items-center"
+                  title="Export JSON"
+                >
+                  <IconDownload /> Save
+                </button>
+                <button
+                  onClick={() => fileInputRef.current.click()}
+                  className="btn-ghost px-2 py-1 text-xs flex gap-1 items-center"
+                  title="Import JSON"
+                >
+                  <IconUpload /> Load
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleImport}
+                  accept=".json"
+                  className="hidden"
+                />
+                <span
+                  className={`text-xs ml-2 uppercase tracking-widest transition-colors ${
+                    isDirty ? "text-[#e0af68]" : "text-[#8f7a54]/50"
                   }`}
                 >
-                  Mindmap
-                </button>
-              </nav>
+                  {" "}
+                  {isDirty ? "Saving..." : "Saved"}{" "}
+                </span>
+              </div>
             </header>
-
-            {/* Main Content */}
-            <main className="flex-grow p-8 container mx-auto mb-8">
-              {view === "characters" &&
+            <main className="flex-grow container mx-auto p-4 lg:p-8 relative z-10">
+              {view === "wiki" && (
+                <LoreWiki
+                  characters={characters}
+                  locations={locations}
+                  items={items}
+                  events={events}
+                  groups={groups}
+                  creatures={creatures}
+                />
+              )}
+              {view === "mindmap" && (
+                <MindMap
+                  characters={characters}
+                  locations={locations}
+                  events={events}
+                  groups={groups}
+                />
+              )}
+              {view === "map" && (
+                <WorldMap mapData={worldMap} onUpdate={setWorldMap} />
+              )}
+              {view === "chars" &&
                 (!editingChar ? (
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center mb-8">
-                      <h2 className="text-3xl brand-font text-white border-b border-[#5c2a2a] pb-2">
-                        Character Roster
-                      </h2>
+                  <div>
+                    {" "}
+                    <div className="flex justify-between items-end mb-8 border-b border-[#e0af68]/20 pb-2">
+                      {" "}
+                      <h2 className="text-3xl brand-font text-white">
+                        Dramatis Personae
+                      </h2>{" "}
                       <button
                         onClick={() =>
                           setEditingChar({
                             id: Date.now(),
                             name: "",
                             age: "",
+                            gender: "Unknown",
+                            status: "Alive",
                             race: "",
                             countryId: "",
                             class: "",
-                            image: "",
+                            image: {
+                              url: "",
+                              shape: "portrait",
+                              scale: 1,
+                              x: 0,
+                              y: 0,
+                              fit: "cover",
+                            },
                             relationships: [],
+                            stats: {
+                              str: 10,
+                              dex: 10,
+                              con: 10,
+                              int: 10,
+                              wis: 10,
+                              cha: 10,
+                            },
                           })
                         }
-                        className="btn-primary flex items-center gap-2"
+                        className="btn-gold"
                       >
-                        <IconPlus /> New Character
-                      </button>
-                    </div>
+                        <IconPlus /> Inscribe Soul
+                      </button>{" "}
+                    </div>{" "}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {" "}
                       {characters.map((char) => (
                         <div
                           key={char.id}
                           onClick={() => setEditingChar(char)}
-                          className="bg-[#24283b] p-4 rounded border border-[#5c2a2a] hover:border-[#e0af68] cursor-pointer transition-all group relative overflow-hidden"
+                          className="glass-panel p-4 cursor-pointer group hover:-translate-y-1 rounded-sm relative"
                         >
-                          <div className="h-48 w-full bg-black/50 mb-4 rounded overflow-hidden">
-                            {char.image ? (
+                          {" "}
+                          {char.status === "Deceased" && (
+                            <div className="absolute top-2 right-2 text-red-900 opacity-50">
+                              <IconSkull />
+                            </div>
+                          )}{" "}
+                          <div className="flex gap-4">
+                            {" "}
+                            <div className="w-20 h-24 bg-black/40 border border-[#e0af68]/30 overflow-hidden relative">
+                              {" "}
                               <img
-                                src={char.image}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-600 italic">
-                                No Image
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="text-2xl text-[#e0af68] brand-font mb-1">
-                            {char.name || "Unnamed"}
-                          </h3>
-                          <p className="text-sm text-gray-400 uppercase tracking-widest mb-2">
-                            {char.race} • {char.class}
-                          </p>
-                          <div className="w-10 h-1 bg-[#5c2a2a] mb-2"></div>
+                                src={getImageSrc(char.image)}
+                                style={getImageStyle(char.image)}
+                                className={
+                                  char.status === "Deceased"
+                                    ? "status-deceased"
+                                    : ""
+                                }
+                              />{" "}
+                            </div>{" "}
+                            <div className="flex-1">
+                              {" "}
+                              <h3
+                                className={`text-2xl brand-font leading-none mb-2 ${
+                                  char.status === "Deceased"
+                                    ? "text-red-900/50 line-through"
+                                    : "text-[#e0af68]"
+                                }`}
+                              >
+                                {char.name || "Unnamed"}
+                              </h3>{" "}
+                              <p className="text-sm text-[#7aa2f7] uppercase tracking-wider">
+                                {char.race} {char.class}
+                              </p>{" "}
+                              <p
+                                className="text-xs text-[#8f7a54] mt-2 italic line-clamp-2"
+                                dangerouslySetInnerHTML={{
+                                  __html: (char.desc || "").replace(
+                                    /<[^>]*>?/gm,
+                                    ""
+                                  ),
+                                }}
+                              ></p>{" "}
+                            </div>{" "}
+                          </div>{" "}
                         </div>
-                      ))}
-                    </div>
+                      ))}{" "}
+                    </div>{" "}
                   </div>
                 ) : (
                   <CharacterEditor
                     character={editingChar}
-                    onSave={handleSaveChar}
+                    allGroups={groups}
+                    onSave={(c, gIds) => {
+                      save(setCharacters, characters, c);
+                      updateCharacterGroups(c.id, gIds);
+                      setEditingChar(null);
+                    }}
                     onCancel={() => setEditingChar(null)}
-                    onDelete={handleDeleteChar}
+                    onDelete={(id) => {
+                      del(setCharacters, characters, id);
+                      setEditingChar(null);
+                    }}
                     allCharacters={characters}
                     allLocations={locations}
                   />
                 ))}
-
-              {view === "locations" &&
+              {view === "locs" &&
                 (!editingLoc ? (
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-center mb-8">
-                      <h2 className="text-3xl brand-font text-white border-b border-[#5c2a2a] pb-2">
-                        Known Locations
-                      </h2>
+                  <div>
+                    {" "}
+                    <div className="flex justify-between items-end mb-8 border-b border-[#e0af68]/20 pb-2">
+                      {" "}
+                      <h2 className="text-3xl brand-font text-white">
+                        Known Realms
+                      </h2>{" "}
                       <button
                         onClick={() =>
                           setEditingLoc({
@@ -777,84 +2336,413 @@
                             name: "",
                             biome: "",
                             species: "",
-                            image: "",
+                            image: {
+                              url: "",
+                              shape: "landscape",
+                              scale: 1,
+                              x: 0,
+                              y: 0,
+                              fit: "cover",
+                            },
                             residents: [],
                           })
                         }
-                        className="btn-primary flex items-center gap-2"
+                        className="btn-gold"
                       >
-                        <IconPlus /> New Location
-                      </button>
-                    </div>
+                        <IconPlus /> Chart Land
+                      </button>{" "}
+                    </div>{" "}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {" "}
                       {locations.map((loc) => (
                         <div
                           key={loc.id}
                           onClick={() => setEditingLoc(loc)}
-                          className="bg-[#24283b] rounded-lg border border-[#5c2a2a] hover:border-[#e0af68] cursor-pointer overflow-hidden flex flex-col md:flex-row h-48 transition-all"
+                          className="glass-panel cursor-pointer group relative overflow-hidden h-64 rounded-lg border border-[#e0af68]/30"
                         >
-                          <div className="md:w-1/3 bg-black/50 h-full relative">
-                            {loc.image ? (
-                              <img
-                                src={loc.image}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-600 italic">
-                                No Image
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-6 flex-1 flex flex-col justify-center">
-                            <h3 className="text-3xl text-[#e0af68] brand-font">
-                              {loc.name || "Unknown Lands"}
-                            </h3>
-                            <p className="text-[#c0caf5]/70 italic mt-2">
-                              {loc.biome}
-                            </p>
-                            <div className="mt-4 text-xs tracking-widest uppercase text-[#5c2a2a] font-bold">
-                              Residents: {loc.residents.length}
-                            </div>
-                          </div>
+                          {" "}
+                          {loc.image && loc.image.url && (
+                            <img
+                              src={getImageSrc(loc.image)}
+                              style={getImageStyle({
+                                ...loc.image,
+                                fit: "cover",
+                                scale: 1,
+                                x: 0,
+                                y: 0,
+                              })}
+                              className="opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+                            />
+                          )}{" "}
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#090A0F] via-transparent to-transparent"></div>{" "}
+                          <div className="absolute bottom-0 left-0 p-6 w-full">
+                            {" "}
+                            <h3 className="text-4xl text-[#e0af68] brand-font drop-shadow-lg">
+                              {loc.name || "Unknown"}
+                            </h3>{" "}
+                            <div className="flex justify-between items-end mt-2 text-[#c0caf5]">
+                              {" "}
+                              <span className="italic">{loc.biome}</span>{" "}
+                              <span className="text-xs border border-[#7aa2f7] px-2 py-1 rounded-full text-[#7aa2f7] uppercase">
+                                {loc.residents?.length || 0} Souls
+                              </span>{" "}
+                            </div>{" "}
+                          </div>{" "}
                         </div>
-                      ))}
-                    </div>
+                      ))}{" "}
+                    </div>{" "}
                   </div>
                 ) : (
                   <LocationEditor
                     location={editingLoc}
-                    onSave={handleSaveLoc}
+                    onSave={(l) => {
+                      save(setLocations, locations, l);
+                      setEditingLoc(null);
+                    }}
                     onCancel={() => setEditingLoc(null)}
-                    onDelete={handleDeleteLoc}
+                    onDelete={(id) => {
+                      del(setLocations, locations, id);
+                      setEditingLoc(null);
+                    }}
                     allCharacters={characters}
                   />
                 ))}
-
-              {view === "mindmap" && (
-                <div className="h-full">
-                  <h2 className="text-3xl brand-font text-white mb-4">
-                    Astral Connections
-                  </h2>
-                  <MindMap characters={characters} locations={locations} />
-                </div>
-              )}
+              {view === "events" &&
+                (!editingEvent ? (
+                  <div>
+                    {" "}
+                    <div className="flex justify-between items-end mb-8 border-b border-[#e0af68]/20 pb-2">
+                      {" "}
+                      <h2 className="text-3xl brand-font text-white">
+                        Timeline of Ages
+                      </h2>{" "}
+                      <button
+                        onClick={() =>
+                          setEditingEvent({
+                            id: Date.now(),
+                            name: "",
+                            era: "",
+                            locationId: "",
+                            participants: [],
+                            desc: "",
+                            image: { url: "", shape: "banner", fit: "cover" },
+                          })
+                        }
+                        className="btn-gold"
+                      >
+                        <IconPlus /> Record Event
+                      </button>{" "}
+                    </div>{" "}
+                    <div className="space-y-4">
+                      {" "}
+                      {events
+                        .sort((a, b) => a.era.localeCompare(b.era))
+                        .map((evt) => (
+                          <div
+                            key={evt.id}
+                            onClick={() => setEditingEvent(evt)}
+                            className="glass-panel p-6 cursor-pointer hover:border-[#f7768e] border-l-4 border-l-[#f7768e] transition-all rounded-r"
+                          >
+                            {" "}
+                            <div className="flex justify-between items-start">
+                              {" "}
+                              <div>
+                                {" "}
+                                <span className="text-xs text-[#f7768e] uppercase tracking-widest block mb-1">
+                                  {evt.era}
+                                </span>{" "}
+                                <h3 className="text-2xl text-[#e0af68] brand-font mb-2">
+                                  {evt.name || "Untitled Event"}
+                                </h3>{" "}
+                                <div
+                                  className="text-[#c0caf5] opacity-80 italic max-w-2xl text-sm line-clamp-2"
+                                  dangerouslySetInnerHTML={{
+                                    __html: (evt.desc || "").replace(
+                                      /<[^>]*>?/gm,
+                                      ""
+                                    ),
+                                  }}
+                                ></div>{" "}
+                              </div>{" "}
+                              <div className="text-right">
+                                {" "}
+                                <div className="text-xs text-[#7aa2f7] uppercase tracking-widest mb-1">
+                                  Location
+                                </div>{" "}
+                                <div className="text-[#c0caf5] mb-3">
+                                  {locations.find(
+                                    (l) => l.id === evt.locationId
+                                  )?.name || "Unknown"}
+                                </div>{" "}
+                              </div>{" "}
+                            </div>{" "}
+                          </div>
+                        ))}{" "}
+                    </div>{" "}
+                  </div>
+                ) : (
+                  <EventEditor
+                    event={editingEvent}
+                    onSave={(e) => {
+                      save(setEvents, events, e);
+                      setEditingEvent(null);
+                    }}
+                    onCancel={() => setEditingEvent(null)}
+                    onDelete={(id) => {
+                      del(setEvents, events, id);
+                      setEditingEvent(null);
+                    }}
+                    allCharacters={characters}
+                    allLocations={locations}
+                  />
+                ))}
+              {view === "groups" &&
+                (!editingGroup ? (
+                  <div>
+                    {" "}
+                    <div className="flex justify-between items-end mb-8 border-b border-[#e0af68]/20 pb-2">
+                      {" "}
+                      <h2 className="text-3xl brand-font text-white">
+                        Families & Guilds
+                      </h2>{" "}
+                      <button
+                        onClick={() =>
+                          setEditingGroup({
+                            id: Date.now(),
+                            name: "",
+                            type: "Guild",
+                            members: [],
+                            desc: "",
+                            image: { url: "", shape: "square", fit: "cover" },
+                          })
+                        }
+                        className="btn-gold"
+                      >
+                        <IconPlus /> Form Group
+                      </button>{" "}
+                    </div>{" "}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {" "}
+                      {groups.map((grp) => (
+                        <div
+                          key={grp.id}
+                          onClick={() => setEditingGroup(grp)}
+                          className="glass-panel p-6 cursor-pointer hover:border-[#bb9af7] transition-all relative overflow-hidden group rounded"
+                        >
+                          {" "}
+                          <div className="relative z-10">
+                            {" "}
+                            <div className="flex justify-between mb-2">
+                              {" "}
+                              <span className="text-[10px] border border-[#bb9af7] text-[#bb9af7] px-2 py-0.5 rounded uppercase">
+                                {grp.type}
+                              </span>{" "}
+                              <span className="text-xs text-[#8f7a54]">
+                                {grp.members?.length || 0} Members
+                              </span>{" "}
+                            </div>{" "}
+                            <h3 className="text-2xl text-[#e0af68] brand-font mb-2">
+                              {grp.name}
+                            </h3>{" "}
+                            <div
+                              className="text-sm text-[#c0caf5] italic opacity-80 line-clamp-2"
+                              dangerouslySetInnerHTML={{
+                                __html: (grp.desc || "").replace(
+                                  /<[^>]*>?/gm,
+                                  ""
+                                ),
+                              }}
+                            ></div>{" "}
+                          </div>{" "}
+                          <div className="absolute top-0 right-0 w-32 h-32 opacity-10 group-hover:opacity-20 transition-opacity">
+                            {" "}
+                            {grp.image?.url && (
+                              <img
+                                src={getImageSrc(grp.image)}
+                                className="w-full h-full object-cover mask-image-gradient"
+                              />
+                            )}{" "}
+                          </div>{" "}
+                        </div>
+                      ))}{" "}
+                    </div>{" "}
+                  </div>
+                ) : (
+                  <GroupEditor
+                    group={editingGroup}
+                    onSave={(g) => {
+                      save(setGroups, groups, g);
+                      setEditingGroup(null);
+                    }}
+                    onCancel={() => setEditingGroup(null)}
+                    onDelete={(id) => {
+                      del(setGroups, groups, id);
+                      setEditingGroup(null);
+                    }}
+                    allCharacters={characters}
+                  />
+                ))}
+              {view === "creatures" &&
+                (!editingCreature ? (
+                  <div>
+                    {" "}
+                    <div className="flex justify-between items-end mb-8 border-b border-[#e0af68]/20 pb-2">
+                      {" "}
+                      <h2 className="text-3xl brand-font text-white">
+                        Bestiary
+                      </h2>{" "}
+                      <button
+                        onClick={() =>
+                          setEditingCreature({
+                            id: Date.now(),
+                            name: "",
+                            type: "Beast",
+                            threat: "Low",
+                            habitatId: "",
+                            desc: "",
+                            image: { url: "", shape: "square", fit: "cover" },
+                            stats: { hp: 10, dmg: "1d6" },
+                          })
+                        }
+                        className="btn-gold"
+                      >
+                        <IconPlus /> Track Beast
+                      </button>{" "}
+                    </div>{" "}
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {" "}
+                      {creatures.map((crit) => (
+                        <div
+                          key={crit.id}
+                          onClick={() => setEditingCreature(crit)}
+                          className="glass-panel p-4 cursor-pointer hover:border-[#9ece6a] transition-all rounded flex flex-col gap-3"
+                        >
+                          {" "}
+                          <div className="w-full aspect-square bg-black/30 border border-[#9ece6a]/20 overflow-hidden relative">
+                            {" "}
+                            {crit.image?.url ? (
+                              <img
+                                src={getImageSrc(crit.image)}
+                                style={getImageStyle(crit.image)}
+                              />
+                            ) : (
+                              <div className="flex items-center justify-center h-full text-[#9ece6a]/30">
+                                ?
+                              </div>
+                            )}{" "}
+                            <div className="absolute top-1 right-1 bg-black/60 px-2 py-0.5 text-[10px] text-[#9ece6a] uppercase border border-[#9ece6a]/30">
+                              {crit.threat}
+                            </div>{" "}
+                          </div>{" "}
+                          <div>
+                            {" "}
+                            <h3 className="text-xl text-[#e0af68] brand-font leading-none">
+                              {crit.name}
+                            </h3>{" "}
+                            <div className="flex justify-between mt-1 text-xs text-[#8f7a54]">
+                              {" "}
+                              <span>{crit.type}</span>{" "}
+                              <span>HP: {crit.stats?.hp}</span>{" "}
+                            </div>{" "}
+                          </div>{" "}
+                        </div>
+                      ))}{" "}
+                    </div>{" "}
+                  </div>
+                ) : (
+                  <CreatureEditor
+                    creature={editingCreature}
+                    onSave={(c) => {
+                      save(setCreatures, creatures, c);
+                      setEditingCreature(null);
+                    }}
+                    onCancel={() => setEditingCreature(null)}
+                    onDelete={(id) => {
+                      del(setCreatures, creatures, id);
+                      setEditingCreature(null);
+                    }}
+                    allLocations={locations}
+                  />
+                ))}
+              {view === "items" &&
+                (!editingItem ? (
+                  <div>
+                    {" "}
+                    <div className="flex justify-between items-end mb-8 border-b border-[#e0af68]/20 pb-2">
+                      {" "}
+                      <h2 className="text-3xl brand-font text-white">
+                        Reliquary
+                      </h2>{" "}
+                      <button
+                        onClick={() =>
+                          setEditingItem({
+                            id: Date.now(),
+                            name: "",
+                            type: "Weapon",
+                            element: "Physical",
+                            rarity: "Common",
+                            stats: { atk: 0, def: 0, wgt: 0, val: 0 },
+                            image: { url: "", shape: "square", fit: "cover" },
+                          })
+                        }
+                        className="btn-gold"
+                      >
+                        <IconPlus /> Forge Item
+                      </button>{" "}
+                    </div>{" "}
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                      {" "}
+                      {items.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => setEditingItem(item)}
+                          className="glass-panel p-3 flex flex-col items-center gap-3 cursor-pointer hover:border-[#e0af68] transition-colors rounded"
+                        >
+                          {" "}
+                          <div className="w-16 h-16 rounded border border-[#e0af68]/20 bg-black/30 flex items-center justify-center overflow-hidden">
+                            {" "}
+                            {item.image && item.image.url ? (
+                              <img
+                                src={getImageSrc(item.image)}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-[#8f7a54]">?</span>
+                            )}{" "}
+                          </div>{" "}
+                          <div className="text-center">
+                            {" "}
+                            <div className="brand-font text-[#e0af68]">
+                              {item.name || "Unknown"}
+                            </div>{" "}
+                            <div className="text-[10px] uppercase text-[#7aa2f7] tracking-widest">
+                              {item.type}
+                            </div>{" "}
+                          </div>{" "}
+                        </div>
+                      ))}{" "}
+                    </div>{" "}
+                  </div>
+                ) : (
+                  <ItemEditor
+                    item={editingItem}
+                    onSave={(i) => {
+                      save(setItems, items, i);
+                      setEditingItem(null);
+                    }}
+                    onCancel={() => setEditingItem(null)}
+                    onDelete={(id) => {
+                      del(setItems, items, id);
+                      setEditingItem(null);
+                    }}
+                  />
+                ))}
             </main>
-
-            {/* Autosave Footer Toast */}
-            <div className="fixed bottom-4 right-4 flex items-center gap-2 bg-[#24283b] border border-[#5c2a2a] px-4 py-2 rounded-full shadow-lg transition-opacity duration-500">
-              <div className="animate-pulse text-[#e0af68]">
-                <IconCheck size={14} />
-              </div>
-              <span className="text-xs text-gray-400 uppercase tracking-widest">
-                Autosaved {lastSaved ? lastSaved.toLocaleTimeString() : ""}
-              </span>
-            </div>
           </div>
         );
       };
 
-      // 3. EDITOR COMPONENTS
-
+      // --- EDITORS ---
       const CharacterEditor = ({
         character,
         onSave,
@@ -862,214 +2750,330 @@
         onDelete,
         allCharacters,
         allLocations,
+        allGroups,
       }) => {
-        const [form, setForm] = useState(character);
-
-        const addRel = () => {
+        const [form, setForm] = useState({
+          stats: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+          gender: "Unknown",
+          status: "Alive",
+          ...character,
+        });
+        const [selectedGroupIds, setSelectedGroupIds] = useState([]);
+        useEffect(() => {
+          if (allGroups) {
+            const ids = allGroups
+              .filter((g) => (g.members || []).includes(character.id))
+              .map((g) => g.id);
+            setSelectedGroupIds(ids);
+          }
+        }, [allGroups, character.id]);
+        const addRel = () =>
           setForm({
             ...form,
             relationships: [
-              ...form.relationships,
+              ...(form.relationships || []),
               { targetId: "", type: "Friend" },
             ],
           });
+        const toggleGroup = (gId) => {
+          setSelectedGroupIds((prev) =>
+            prev.includes(gId)
+              ? prev.filter((id) => id !== gId)
+              : [...prev, gId]
+          );
         };
-
-        const updateRel = (idx, field, value) => {
-          const newRels = [...form.relationships];
-          newRels[idx][field] = value;
-          setForm({ ...form, relationships: newRels });
-        };
-
-        const removeRel = (idx) => {
-          setForm({
-            ...form,
-            relationships: form.relationships.filter((_, i) => i !== idx),
-          });
-        };
-
         return (
-          <div className="max-w-4xl mx-auto bg-[#24283b] p-8 rounded border border-[#5c2a2a] shadow-2xl flex gap-8 flex-col md:flex-row">
-            {/* Left: Image Card Look */}
-            <div className="w-full md:w-1/3 flex flex-col gap-4">
-              <div className="aspect-[3/4] bg-[#4a2c2c] rounded flex items-center justify-center overflow-hidden border-4 border-[#4a2c2c] shadow-inner relative group">
-                {form.image ? (
-                  <img
-                    src={form.image}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="brand-font text-2xl opacity-50 text-[#e0af68]">
-                    [PICTURE]
-                  </span>
-                )}
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-4">
-                  <label className="text-xs uppercase text-gray-400 mb-1">
-                    Image URL
-                  </label>
-                  <input
-                    type="text"
-                    value={form.image}
-                    onChange={(e) =>
-                      setForm({ ...form, image: e.target.value })
-                    }
-                    className="input-std text-xs"
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
-              <div className="flex gap-2">
+          <div className="glass-panel max-w-5xl mx-auto p-10 rounded-lg flex flex-col md:flex-row gap-10 border-t-2 border-t-[#e0af68]">
+            {" "}
+            <div className="w-full md:w-1/3 flex flex-col gap-6">
+              {" "}
+              <h3 className="brand-font text-2xl text-[#e0af68] text-center mb-2">
+                Visage
+              </h3>{" "}
+              <ImagePicker
+                value={form.image}
+                onChange={(val) => setForm({ ...form, image: val })}
+              />{" "}
+              <div className="p-4 bg-black/20 border border-[#e0af68]/10 rounded mt-4">
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#e0af68] block mb-3 border-b border-[#e0af68]/20 pb-1">
+                  Attributes
+                </label>{" "}
+                <div className="grid grid-cols-3 gap-2">
+                  {" "}
+                  {["str", "dex", "con", "int", "wis", "cha"].map((s) => (
+                    <div key={s}>
+                      {" "}
+                      <label className="text-[10px] text-[#8f7a54] uppercase block mb-1 text-center">
+                        {s}
+                      </label>{" "}
+                      <input
+                        type="number"
+                        value={form.stats ? form.stats[s] : 10}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            stats: {
+                              ...(form.stats || {}),
+                              [s]: e.target.value,
+                            },
+                          })
+                        }
+                        className="input-astral text-center font-mono text-sm"
+                      />{" "}
+                    </div>
+                  ))}{" "}
+                </div>{" "}
+              </div>{" "}
+              <div className="flex gap-4 mt-2">
+                {" "}
                 <button
-                  onClick={() => onSave(form)}
-                  className="flex-1 btn-primary bg-[#e0af68] text-[#1a1b26] hover:bg-white font-bold"
+                  onClick={() => onSave(form, selectedGroupIds)}
+                  className="flex-1 btn-gold"
                 >
-                  Save Profile
-                </button>
+                  Save
+                </button>{" "}
                 <button
                   onClick={() => onDelete(form.id)}
-                  className="px-3 py-2 bg-red-900/50 hover:bg-red-900 text-white rounded"
+                  className="px-3 text-red-400 border border-red-900/50 hover:bg-red-900/20 rounded"
                 >
                   <IconTrash size={18} />
-                </button>
-              </div>
+                </button>{" "}
+              </div>{" "}
               <button
                 onClick={onCancel}
-                className="text-gray-500 hover:text-white text-sm underline"
+                className="text-[#8f7a54] hover:text-[#e0af68] uppercase text-xs tracking-widest mt-2"
               >
-                Cancel
-              </button>
-            </div>
-
-            {/* Right: Details */}
-            <div className="flex-1 space-y-6">
-              <div className="border-b border-[#5c2a2a] pb-4">
-                <label className="text-xs uppercase tracking-widest text-[#5c2a2a] font-bold">
-                  Full Name
-                </label>
+                Dismiss
+              </button>{" "}
+            </div>{" "}
+            <div className="flex-1 space-y-8">
+              {" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-[0.2em] text-[#8f7a54]">
+                  True Name
+                </label>{" "}
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-transparent text-4xl text-[#e0af68] brand-font border-none outline-none placeholder-[#e0af68]/20"
-                  placeholder="CHARACTER NAME"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+                  className="w-full bg-transparent text-5xl brand-font text-[#e0af68] border-b border-[#e0af68]/30 focus:border-[#e0af68] outline-none pb-2"
+                  placeholder="NAME"
+                />{" "}
+              </div>{" "}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {" "}
                 <div>
-                  <label className="text-xs uppercase tracking-widest text-gray-500">
-                    Age
-                  </label>
-                  <input
-                    value={form.age}
-                    onChange={(e) => setForm({ ...form, age: e.target.value })}
-                    className="input-std"
-                    placeholder="Unknown"
-                  />
-                </div>
+                  {" "}
+                  <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
+                    Gender
+                  </label>{" "}
+                  <select
+                    value={form.gender}
+                    onChange={(e) =>
+                      setForm({ ...form, gender: e.target.value })
+                    }
+                    className="input-astral"
+                  >
+                    {" "}
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Non-Binary</option>
+                    <option>Unknown</option>
+                    <option>None</option>{" "}
+                  </select>{" "}
+                </div>{" "}
                 <div>
-                  <label className="text-xs uppercase tracking-widest text-gray-500">
+                  {" "}
+                  <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
+                    Status
+                  </label>{" "}
+                  <select
+                    value={form.status}
+                    onChange={(e) =>
+                      setForm({ ...form, status: e.target.value })
+                    }
+                    className={`input-astral ${
+                      form.status === "Deceased" ? "text-red-400" : ""
+                    }`}
+                  >
+                    {" "}
+                    <option>Alive</option>
+                    <option>Deceased</option>
+                    <option>Missing</option>
+                    <option>Unknown</option>
+                    <option>Ascended</option>{" "}
+                  </select>{" "}
+                </div>{" "}
+                <div>
+                  {" "}
+                  <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
                     Race
-                  </label>
+                  </label>{" "}
                   <input
                     value={form.race}
                     onChange={(e) => setForm({ ...form, race: e.target.value })}
-                    className="input-std"
-                    placeholder="Human, Elf..."
-                  />
-                </div>
+                    className="input-astral"
+                  />{" "}
+                </div>{" "}
                 <div>
-                  <label className="text-xs uppercase tracking-widest text-gray-500">
+                  {" "}
+                  <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
                     Class
-                  </label>
+                  </label>{" "}
                   <input
                     value={form.class}
                     onChange={(e) =>
                       setForm({ ...form, class: e.target.value })
                     }
-                    className="input-std"
-                    placeholder="Warrior, Mage..."
-                  />
-                </div>
+                    className="input-astral"
+                  />{" "}
+                </div>{" "}
+              </div>{" "}
+              <div className="grid grid-cols-2 gap-4">
+                {" "}
                 <div>
-                  <label className="text-xs uppercase tracking-widest text-gray-500">
-                    Location/Country
-                  </label>
+                  {" "}
+                  <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
+                    Age
+                  </label>{" "}
+                  <input
+                    value={form.age}
+                    onChange={(e) => setForm({ ...form, age: e.target.value })}
+                    className="input-astral"
+                  />{" "}
+                </div>{" "}
+                <div>
+                  {" "}
+                  <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
+                    Origin
+                  </label>{" "}
                   <select
                     value={form.countryId}
                     onChange={(e) =>
                       setForm({ ...form, countryId: parseInt(e.target.value) })
                     }
-                    className="input-std"
+                    className="input-astral"
                   >
-                    <option value="">-- Wandering --</option>
+                    {" "}
+                    <option value="">-- The Void --</option>{" "}
                     {allLocations.map((l) => (
                       <option key={l.id} value={l.id}>
                         {l.name}
                       </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-[#5c2a2a]/30">
+                    ))}{" "}
+                  </select>{" "}
+                </div>{" "}
+              </div>{" "}
+              <div className="p-4 bg-[#bb9af7]/10 border border-[#bb9af7]/20 rounded">
+                {" "}
+                <h3 className="brand-font text-lg text-[#bb9af7] mb-2 uppercase tracking-widest">
+                  Affiliations & Guilds
+                </h3>{" "}
+                <div className="flex flex-wrap gap-2">
+                  {" "}
+                  {allGroups.map((grp) => (
+                    <button
+                      key={grp.id}
+                      onClick={() => toggleGroup(grp.id)}
+                      className={`px-3 py-1 rounded border text-xs uppercase transition-colors ${
+                        selectedGroupIds.includes(grp.id)
+                          ? "bg-[#bb9af7] text-black border-[#bb9af7]"
+                          : "border-[#bb9af7]/30 text-[#bb9af7] hover:border-[#bb9af7]"
+                      }`}
+                    >
+                      {" "}
+                      {selectedGroupIds.includes(grp.id) ? "✓ " : ""}
+                      {grp.name}{" "}
+                    </button>
+                  ))}{" "}
+                  {allGroups.length === 0 && (
+                    <span className="text-[#8f7a54] text-sm italic">
+                      No factions established yet.
+                    </span>
+                  )}{" "}
+                </div>{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
+                  Lore (Rich Text)
+                </label>{" "}
+                <RichTextEditor
+                  value={form.desc}
+                  onChange={(val) => setForm({ ...form, desc: val })}
+                />{" "}
+              </div>{" "}
+              <div className="pt-4 border-t border-[#e0af68]/20">
+                {" "}
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="brand-font text-xl text-white">
-                    Relationships
-                  </h3>
+                  <h3 className="brand-font text-xl text-[#e0af68]">Bonds</h3>
                   <button
                     onClick={addRel}
-                    type="button"
-                    className="text-xs bg-[#5c2a2a] px-2 py-1 rounded hover:bg-[#e0af68] hover:text-black transition-colors"
+                    className="text-xs border border-[#e0af68] text-[#e0af68] px-2 py-1 hover:bg-[#e0af68] hover:text-black uppercase tracking-widest"
                   >
-                    + Add
+                    + Bind
                   </button>
-                </div>
-
-                <div className="space-y-2">
-                  {form.relationships.length === 0 && (
-                    <p className="text-gray-600 text-sm italic">
-                      No relationships defined.
-                    </p>
-                  )}
-                  {form.relationships.map((rel, idx) => (
-                    <div key={idx} className="flex gap-2 items-center">
+                </div>{" "}
+                <div className="space-y-3">
+                  {" "}
+                  {form.relationships?.map((rel, idx) => (
+                    <div
+                      key={idx}
+                      className="flex gap-3 items-center bg-black/20 p-2 border border-[#e0af68]/10 rounded"
+                    >
+                      {" "}
                       <select
                         value={rel.targetId}
-                        onChange={(e) =>
-                          updateRel(idx, "targetId", parseInt(e.target.value))
-                        }
-                        className="flex-1 input-std text-sm"
+                        onChange={(e) => {
+                          const r = [...form.relationships];
+                          r[idx].targetId = parseInt(e.target.value);
+                          setForm({ ...form, relationships: r });
+                        }}
+                        className="flex-1 bg-transparent text-[#c0caf5] outline-none text-sm font-serif"
                       >
-                        <option value="">Select Character...</option>
+                        {" "}
+                        <option value="">Select Soul...</option>{" "}
                         {allCharacters
                           .filter((c) => c.id !== form.id)
                           .map((c) => (
                             <option key={c.id} value={c.id}>
                               {c.name}
                             </option>
-                          ))}
-                      </select>
+                          ))}{" "}
+                      </select>{" "}
+                      <span className="text-[#e0af68]">&rarr;</span>{" "}
                       <input
                         value={rel.type}
-                        onChange={(e) => updateRel(idx, "type", e.target.value)}
-                        className="flex-1 input-std text-sm"
-                        placeholder="Relation (e.g. Brother)"
-                      />
+                        onChange={(e) => {
+                          const r = [...form.relationships];
+                          r[idx].type = e.target.value;
+                          setForm({ ...form, relationships: r });
+                        }}
+                        className="flex-1 bg-transparent text-right text-[#c0caf5] outline-none text-sm italic"
+                        placeholder="Connection type"
+                      />{" "}
                       <button
-                        onClick={() => removeRel(idx)}
-                        className="text-red-500 hover:text-red-400"
+                        onClick={() =>
+                          setForm({
+                            ...form,
+                            relationships: form.relationships.filter(
+                              (_, i) => i !== idx
+                            ),
+                          })
+                        }
+                        className="text-red-400 hover:text-red-300"
                       >
                         <IconTrash size={14} />
-                      </button>
+                      </button>{" "}
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+                  ))}{" "}
+                </div>{" "}
+              </div>{" "}
+            </div>{" "}
           </div>
         );
       };
-
       const LocationEditor = ({
         location,
         onSave,
@@ -1078,84 +3082,52 @@
         allCharacters,
       }) => {
         const [form, setForm] = useState(location);
-
-        // Handle multi-select for residents
-        const toggleResident = (charId) => {
-          const current = form.residents || [];
-          if (current.includes(charId)) {
-            setForm({
-              ...form,
-              residents: current.filter((id) => id !== charId),
-            });
-          } else {
-            setForm({ ...form, residents: [...current, charId] });
-          }
+        const toggleRes = (id) => {
+          const r = form.residents || [];
+          setForm({
+            ...form,
+            residents: r.includes(id) ? r.filter((x) => x !== id) : [...r, id],
+          });
         };
-
         return (
-          <div className="max-w-4xl mx-auto bg-[#24283b] p-8 rounded border border-[#5c2a2a] shadow-2xl">
-            <div className="flex justify-between items-start mb-6 border-b border-[#5c2a2a] pb-4">
+          <div className="glass-panel max-w-4xl mx-auto p-8 rounded-lg border-t-2 border-t-[#e0af68]">
+            {" "}
+            <div className="flex justify-between items-start mb-8 border-b border-[#e0af68]/30 pb-4">
+              {" "}
               <div className="w-full">
-                <label className="text-xs uppercase tracking-widest text-[#5c2a2a] font-bold">
-                  Location Name
-                </label>
+                {" "}
+                <label className="text-xs uppercase tracking-[0.3em] text-[#e0af68]">
+                  Realm Name
+                </label>{" "}
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full bg-transparent text-4xl text-[#e0af68] brand-font border-none outline-none placeholder-[#e0af68]/20"
-                  placeholder="LOCATION NAME"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => onSave(form)}
-                  className="btn-primary bg-[#e0af68] text-[#1a1b26] hover:bg-white font-bold"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => onDelete(form.id)}
-                  className="px-3 py-2 bg-red-900/50 hover:bg-red-900 text-white rounded"
-                >
-                  <IconTrash size={18} />
-                </button>
-                <button
-                  onClick={onCancel}
-                  className="px-3 py-2 text-gray-400 hover:text-white"
-                >
+                  className="w-full bg-transparent text-4xl brand-font text-white border-none outline-none"
+                  placeholder="UNNAMED LANDS"
+                />{" "}
+              </div>{" "}
+              <div className="flex gap-3">
+                {" "}
+                <button onClick={() => onSave(form)} className="btn-gold">
+                  Chart
+                </button>{" "}
+                <button onClick={onCancel} className="btn-ghost">
                   Close
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs uppercase tracking-widest text-gray-500">
-                    Image URL
-                  </label>
-                  <input
-                    value={form.image}
-                    onChange={(e) =>
-                      setForm({ ...form, image: e.target.value })
-                    }
-                    className="input-std"
-                    placeholder="https://..."
-                  />
-                </div>
-                <div className="h-48 bg-black/40 rounded overflow-hidden border border-[#5c2a2a]/30 flex items-center justify-center">
-                  {form.image ? (
-                    <img
-                      src={form.image}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-gray-600 italic">Preview</span>
-                  )}
-                </div>
+                </button>{" "}
+              </div>{" "}
+            </div>{" "}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+              {" "}
+              <div className="space-y-6">
+                {" "}
+                <ImagePicker
+                  value={form.image}
+                  onChange={(val) => setForm({ ...form, image: val })}
+                />{" "}
                 <div className="grid grid-cols-2 gap-4">
+                  {" "}
                   <div>
-                    <label className="text-xs uppercase tracking-widest text-gray-500">
+                    <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
                       Biome
                     </label>
                     <input
@@ -1163,69 +3135,655 @@
                       onChange={(e) =>
                         setForm({ ...form, biome: e.target.value })
                       }
-                      className="input-std"
-                      placeholder="Forest, Desert..."
+                      className="input-astral"
                     />
-                  </div>
+                  </div>{" "}
                   <div>
-                    <label className="text-xs uppercase tracking-widest text-gray-500">
-                      Dominant Species
+                    <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                      Kin
                     </label>
                     <input
                       value={form.species}
                       onChange={(e) =>
                         setForm({ ...form, species: e.target.value })
                       }
-                      className="input-std"
-                      placeholder="Elves, Orcs..."
+                      className="input-astral"
                     />
-                  </div>
-                </div>
-              </div>
-
+                  </div>{" "}
+                </div>{" "}
+                <div>
+                  {" "}
+                  <label className="text-xs uppercase tracking-[0.2em] text-[#7aa2f7] block mb-2">
+                    Description
+                  </label>{" "}
+                  <RichTextEditor
+                    value={form.desc}
+                    onChange={(val) => setForm({ ...form, desc: val })}
+                  />{" "}
+                </div>{" "}
+              </div>{" "}
               <div>
-                <h3 className="brand-font text-xl text-white mb-4">
-                  Known Residents
-                </h3>
-                <div className="bg-[#1a1b26] p-4 rounded border border-[#5c2a2a]/30 h-64 overflow-y-auto">
-                  {allCharacters.length === 0 && (
-                    <p className="text-gray-600 italic">
-                      No characters created yet.
-                    </p>
-                  )}
+                {" "}
+                <h3 className="brand-font text-xl text-[#e0af68] mb-4">
+                  Denizens
+                </h3>{" "}
+                <div className="bg-black/20 p-4 border border-[#e0af68]/20 h-80 overflow-y-auto rounded custom-scrollbar">
+                  {" "}
                   {allCharacters.map((char) => (
                     <label
                       key={char.id}
-                      className="flex items-center gap-3 p-2 hover:bg-[#24283b] cursor-pointer rounded mb-1"
+                      className="flex items-center gap-3 p-2 hover:bg-[#e0af68]/10 cursor-pointer border-b border-[#e0af68]/5 transition-colors"
                     >
+                      {" "}
                       <input
                         type="checkbox"
-                        checked={form.residents.includes(char.id)}
-                        onChange={() => toggleResident(char.id)}
+                        checked={(form.residents || []).includes(char.id)}
+                        onChange={() => toggleRes(char.id)}
                         className="accent-[#e0af68]"
-                      />
-                      <div className="w-8 h-8 bg-black rounded-full overflow-hidden">
-                        {char.image && (
-                          <img
-                            src={char.image}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
+                      />{" "}
                       <span
                         className={
-                          form.residents.includes(char.id)
+                          (form.residents || []).includes(char.id)
                             ? "text-[#e0af68]"
-                            : "text-gray-400"
+                            : "text-[#8f7a54]"
                         }
                       >
                         {char.name}
-                      </span>
+                      </span>{" "}
                     </label>
-                  ))}
-                </div>
-              </div>
-            </div>
+                  ))}{" "}
+                </div>{" "}
+              </div>{" "}
+            </div>{" "}
+          </div>
+        );
+      };
+      const EventEditor = ({
+        event,
+        onSave,
+        onCancel,
+        onDelete,
+        allCharacters,
+        allLocations,
+      }) => {
+        const [form, setForm] = useState(event);
+        const toggleParticipant = (id) => {
+          const p = form.participants || [];
+          setForm({
+            ...form,
+            participants: p.includes(id)
+              ? p.filter((x) => x !== id)
+              : [...p, id],
+          });
+        };
+        return (
+          <div className="glass-panel max-w-4xl mx-auto p-8 rounded-lg border-t-2 border-t-[#f7768e] flex flex-col md:flex-row gap-8">
+            {" "}
+            <div className="w-full md:w-1/3 flex flex-col gap-4">
+              {" "}
+              <div className="text-center text-[#f7768e] brand-font border-b border-[#f7768e]/30 pb-2">
+                Event Visual
+              </div>{" "}
+              <ImagePicker
+                value={form.image}
+                onChange={(val) => setForm({ ...form, image: val })}
+                placeholder="Image URL (Banner)"
+              />{" "}
+              <div className="flex gap-2 mt-4">
+                {" "}
+                <button
+                  onClick={() => onSave(form)}
+                  className="flex-1 btn-gold"
+                >
+                  Record
+                </button>{" "}
+                <button
+                  onClick={() => onDelete(form.id)}
+                  className="px-3 text-red-400 border border-red-900/50 hover:bg-red-900/20 rounded"
+                >
+                  <IconTrash size={18} />
+                </button>{" "}
+              </div>{" "}
+              <button
+                onClick={onCancel}
+                className="text-[#8f7a54] hover:text-[#e0af68] text-xs uppercase text-center tracking-widest"
+              >
+                Cancel
+              </button>{" "}
+            </div>{" "}
+            <div className="flex-1 space-y-6">
+              {" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-[0.3em] text-[#f7768e]">
+                  Event Name
+                </label>{" "}
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-transparent text-3xl brand-font text-white border-none outline-none"
+                  placeholder="THE GREAT WAR"
+                />{" "}
+              </div>{" "}
+              <div className="grid grid-cols-2 gap-4">
+                {" "}
+                <div>
+                  <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                    Era / Date
+                  </label>
+                  <input
+                    value={form.era}
+                    onChange={(e) => setForm({ ...form, era: e.target.value })}
+                    className="input-astral"
+                    placeholder="e.g. 2nd Age"
+                  />
+                </div>{" "}
+                <div>
+                  {" "}
+                  <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                    Location
+                  </label>{" "}
+                  <select
+                    value={form.locationId}
+                    onChange={(e) =>
+                      setForm({ ...form, locationId: parseInt(e.target.value) })
+                    }
+                    className="input-astral"
+                  >
+                    {" "}
+                    <option value="">Unknown Location</option>{" "}
+                    {allLocations.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.name}
+                      </option>
+                    ))}{" "}
+                  </select>{" "}
+                </div>{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                  Chronicle
+                </label>{" "}
+                <RichTextEditor
+                  value={form.desc}
+                  onChange={(val) => setForm({ ...form, desc: val })}
+                />{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <h3 className="brand-font text-lg text-[#e0af68] mb-2">
+                  Participants
+                </h3>{" "}
+                <div className="bg-black/20 p-2 border border-[#f7768e]/20 h-40 overflow-y-auto rounded custom-scrollbar grid grid-cols-2 gap-2">
+                  {" "}
+                  {allCharacters.map((char) => (
+                    <label
+                      key={char.id}
+                      className="flex items-center gap-2 p-1 hover:bg-[#f7768e]/10 cursor-pointer transition-colors rounded"
+                    >
+                      {" "}
+                      <input
+                        type="checkbox"
+                        checked={(form.participants || []).includes(char.id)}
+                        onChange={() => toggleParticipant(char.id)}
+                        className="accent-[#f7768e]"
+                      />{" "}
+                      <span
+                        className={
+                          (form.participants || []).includes(char.id)
+                            ? "text-[#f7768e]"
+                            : "text-[#8f7a54] text-sm"
+                        }
+                      >
+                        {char.name}
+                      </span>{" "}
+                    </label>
+                  ))}{" "}
+                </div>{" "}
+              </div>{" "}
+            </div>{" "}
+          </div>
+        );
+      };
+      const GroupEditor = ({
+        group,
+        onSave,
+        onCancel,
+        onDelete,
+        allCharacters,
+      }) => {
+        const [form, setForm] = useState(group);
+        const toggleMember = (id) => {
+          const m = form.members || [];
+          setForm({
+            ...form,
+            members: m.includes(id) ? m.filter((x) => x !== id) : [...m, id],
+          });
+        };
+        return (
+          <div className="glass-panel max-w-4xl mx-auto p-8 rounded-lg border-t-2 border-t-[#bb9af7] flex flex-col md:flex-row gap-8">
+            {" "}
+            <div className="w-full md:w-1/3 flex flex-col gap-4">
+              {" "}
+              <div className="text-center text-[#bb9af7] brand-font border-b border-[#bb9af7]/30 pb-2">
+                Sigil
+              </div>{" "}
+              <ImagePicker
+                value={form.image}
+                onChange={(val) => setForm({ ...form, image: val })}
+              />{" "}
+              <div className="flex gap-2 mt-4">
+                {" "}
+                <button
+                  onClick={() => onSave(form)}
+                  className="flex-1 btn-gold"
+                >
+                  Establish
+                </button>{" "}
+                <button
+                  onClick={() => onDelete(form.id)}
+                  className="px-3 text-red-400 border border-red-900/50 hover:bg-red-900/20 rounded"
+                >
+                  <IconTrash size={18} />
+                </button>{" "}
+              </div>{" "}
+              <button
+                onClick={onCancel}
+                className="text-[#8f7a54] hover:text-[#e0af68] text-xs uppercase text-center tracking-widest"
+              >
+                Cancel
+              </button>{" "}
+            </div>{" "}
+            <div className="flex-1 space-y-6">
+              {" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-[0.3em] text-[#bb9af7]">
+                  Faction Name
+                </label>{" "}
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-transparent text-3xl brand-font text-white border-none outline-none"
+                  placeholder="NAME"
+                />{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                  Type (Select or Type Custom)
+                </label>{" "}
+                <input
+                  list="faction-types"
+                  value={form.type}
+                  onChange={(e) => setForm({ ...form, type: e.target.value })}
+                  className="input-astral"
+                />{" "}
+                <datalist id="faction-types">
+                  {" "}
+                  <option value="Family" /> <option value="Guild" />{" "}
+                  <option value="Cult" /> <option value="Kingdom" />{" "}
+                  <option value="Party" /> <option value="Religion" />{" "}
+                  <option value="Military" />{" "}
+                </datalist>{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                  Tenets & Goals
+                </label>{" "}
+                <RichTextEditor
+                  value={form.desc}
+                  onChange={(val) => setForm({ ...form, desc: val })}
+                />{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <h3 className="brand-font text-lg text-[#e0af68] mb-2">
+                  Members
+                </h3>{" "}
+                <div className="bg-black/20 p-2 border border-[#bb9af7]/20 h-40 overflow-y-auto rounded custom-scrollbar grid grid-cols-2 gap-2">
+                  {" "}
+                  {allCharacters.map((char) => (
+                    <label
+                      key={char.id}
+                      className="flex items-center gap-2 p-1 hover:bg-[#bb9af7]/10 cursor-pointer transition-colors rounded"
+                    >
+                      {" "}
+                      <input
+                        type="checkbox"
+                        checked={(form.members || []).includes(char.id)}
+                        onChange={() => toggleMember(char.id)}
+                        className="accent-[#bb9af7]"
+                      />{" "}
+                      <span
+                        className={
+                          (form.members || []).includes(char.id)
+                            ? "text-[#bb9af7]"
+                            : "text-[#8f7a54] text-sm"
+                        }
+                      >
+                        {char.name}
+                      </span>{" "}
+                    </label>
+                  ))}{" "}
+                </div>{" "}
+              </div>{" "}
+            </div>{" "}
+          </div>
+        );
+      };
+      const CreatureEditor = ({
+        creature,
+        onSave,
+        onCancel,
+        onDelete,
+        allLocations,
+      }) => {
+        const [form, setForm] = useState(creature);
+        return (
+          <div className="glass-panel max-w-4xl mx-auto p-8 rounded-lg border-t-2 border-t-[#9ece6a] flex flex-col md:flex-row gap-8">
+            {" "}
+            <div className="w-full md:w-1/3 flex flex-col gap-4">
+              {" "}
+              <div className="text-center text-[#9ece6a] brand-font border-b border-[#9ece6a]/30 pb-2">
+                Beast
+              </div>{" "}
+              <ImagePicker
+                value={form.image}
+                onChange={(val) => setForm({ ...form, image: val })}
+              />{" "}
+              <div className="flex gap-2 mt-4">
+                {" "}
+                <button
+                  onClick={() => onSave(form)}
+                  className="flex-1 btn-gold"
+                >
+                  Track
+                </button>{" "}
+                <button
+                  onClick={() => onDelete(form.id)}
+                  className="px-3 text-red-400 border border-red-900/50 hover:bg-red-900/20 rounded"
+                >
+                  <IconTrash size={18} />
+                </button>{" "}
+              </div>{" "}
+              <button
+                onClick={onCancel}
+                className="text-[#8f7a54] hover:text-[#e0af68] text-xs uppercase text-center tracking-widest"
+              >
+                Cancel
+              </button>{" "}
+            </div>{" "}
+            <div className="flex-1 space-y-6">
+              {" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-[0.3em] text-[#9ece6a]">
+                  Creature Name
+                </label>{" "}
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-transparent text-3xl brand-font text-white border-none outline-none"
+                  placeholder="NAME"
+                />{" "}
+              </div>{" "}
+              <div className="grid grid-cols-2 gap-4">
+                {" "}
+                <div>
+                  {" "}
+                  <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                    Type
+                  </label>{" "}
+                  <input
+                    value={form.type}
+                    onChange={(e) => setForm({ ...form, type: e.target.value })}
+                    className="input-astral"
+                    placeholder="e.g. Undead, Beast"
+                  />{" "}
+                </div>{" "}
+                <div>
+                  {" "}
+                  <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                    Threat Level
+                  </label>{" "}
+                  <select
+                    value={form.threat}
+                    onChange={(e) =>
+                      setForm({ ...form, threat: e.target.value })
+                    }
+                    className="input-astral"
+                  >
+                    {" "}
+                    <option>Low</option>
+                    <option>Medium</option>
+                    <option>High</option>
+                    <option>Extreme</option>
+                    <option>Godlike</option>{" "}
+                  </select>{" "}
+                </div>{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                  Primary Habitat
+                </label>{" "}
+                <select
+                  value={form.habitatId}
+                  onChange={(e) =>
+                    setForm({ ...form, habitatId: parseInt(e.target.value) })
+                  }
+                  className="input-astral"
+                >
+                  {" "}
+                  <option value="">-- Wandering --</option>{" "}
+                  {allLocations.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}{" "}
+                </select>{" "}
+              </div>{" "}
+              <div className="bg-black/20 p-3 border border-[#9ece6a]/20 rounded">
+                {" "}
+                <div className="grid grid-cols-2 gap-4">
+                  {" "}
+                  <div>
+                    {" "}
+                    <label className="text-[10px] text-[#9ece6a] uppercase">
+                      Hit Points
+                    </label>{" "}
+                    <input
+                      value={form.stats?.hp}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          stats: { ...form.stats, hp: e.target.value },
+                        })
+                      }
+                      className="input-astral font-mono"
+                    />{" "}
+                  </div>{" "}
+                  <div>
+                    {" "}
+                    <label className="text-[10px] text-[#9ece6a] uppercase">
+                      Damage
+                    </label>{" "}
+                    <input
+                      value={form.stats?.dmg}
+                      onChange={(e) =>
+                        setForm({
+                          ...form,
+                          stats: { ...form.stats, dmg: e.target.value },
+                        })
+                      }
+                      className="input-astral font-mono"
+                    />{" "}
+                  </div>{" "}
+                </div>{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                  Description
+                </label>{" "}
+                <RichTextEditor
+                  value={form.desc}
+                  onChange={(val) => setForm({ ...form, desc: val })}
+                />{" "}
+              </div>{" "}
+            </div>{" "}
+          </div>
+        );
+      };
+      const ItemEditor = ({ item, onSave, onCancel, onDelete }) => {
+        const [form, setForm] = useState(item);
+        return (
+          <div className="glass-panel max-w-4xl mx-auto p-8 rounded-lg border-t-2 border-t-[#e0af68] flex flex-col md:flex-row gap-8">
+            {" "}
+            <div className="w-full md:w-1/3 flex flex-col gap-4">
+              {" "}
+              <div className="text-center text-[#e0af68] brand-font border-b border-[#e0af68]/30 pb-2">
+                Artifact Visual
+              </div>{" "}
+              <ImagePicker
+                value={form.image}
+                onChange={(val) => setForm({ ...form, image: val })}
+              />{" "}
+              <div className="flex gap-2 mt-4">
+                {" "}
+                <button
+                  onClick={() => onSave(form)}
+                  className="flex-1 btn-gold"
+                >
+                  Forge
+                </button>{" "}
+                <button
+                  onClick={() => onDelete(form.id)}
+                  className="px-3 text-red-400 border border-red-900/50 hover:bg-red-900/20 rounded"
+                >
+                  <IconTrash size={18} />
+                </button>{" "}
+              </div>{" "}
+              <button
+                onClick={onCancel}
+                className="text-[#8f7a54] hover:text-[#e0af68] text-xs uppercase text-center tracking-widest"
+              >
+                Cancel
+              </button>{" "}
+            </div>{" "}
+            <div className="flex-1 space-y-6">
+              {" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-[0.3em] text-[#e0af68]">
+                  Relic Name
+                </label>{" "}
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  className="w-full bg-transparent text-4xl brand-font text-white border-none outline-none"
+                  placeholder="NAME"
+                />{" "}
+              </div>{" "}
+              <div className="grid grid-cols-2 gap-4">
+                {" "}
+                <div>
+                  <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                    Type
+                  </label>
+                  <select
+                    value={form.type}
+                    onChange={(e) => setForm({ ...form, type: e.target.value })}
+                    className="input-astral"
+                  >
+                    <option>Weapon</option>
+                    <option>Armor</option>
+                    <option>Potion</option>
+                    <option>Key Item</option>
+                    <option>Artifact</option>
+                  </select>
+                </div>{" "}
+                <div>
+                  <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                    Element
+                  </label>
+                  <select
+                    value={form.element || "Physical"}
+                    onChange={(e) =>
+                      setForm({ ...form, element: e.target.value })
+                    }
+                    className="input-astral"
+                  >
+                    <option>Physical</option>
+                    <option>Fire</option>
+                    <option>Ice</option>
+                    <option>Lightning</option>
+                    <option>Light</option>
+                    <option>Dark</option>
+                  </select>
+                </div>{" "}
+                <div>
+                  <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                    Rarity
+                  </label>
+                  <select
+                    value={form.rarity}
+                    onChange={(e) =>
+                      setForm({ ...form, rarity: e.target.value })
+                    }
+                    className="input-astral"
+                  >
+                    <option>Common</option>
+                    <option>Uncommon</option>
+                    <option>Rare</option>
+                    <option>Epic</option>
+                    <option>Legendary</option>
+                  </select>
+                </div>{" "}
+              </div>{" "}
+              <div className="p-4 bg-black/20 border border-[#e0af68]/10 rounded">
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#e0af68] block mb-3 border-b border-[#e0af68]/20 pb-1">
+                  Properties
+                </label>{" "}
+                <div className="grid grid-cols-4 gap-2">
+                  {" "}
+                  {["atk", "def", "wgt", "val"].map((s) => (
+                    <div key={s}>
+                      {" "}
+                      <label className="text-[10px] text-[#8f7a54] uppercase block mb-1 text-center">
+                        {s}
+                      </label>{" "}
+                      <input
+                        type="number"
+                        value={form.stats[s]}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            stats: { ...form.stats, [s]: e.target.value },
+                          })
+                        }
+                        className="input-astral text-center font-mono text-sm"
+                      />{" "}
+                    </div>
+                  ))}{" "}
+                </div>{" "}
+              </div>{" "}
+              <div>
+                {" "}
+                <label className="text-xs uppercase tracking-widest text-[#7aa2f7] block mb-1">
+                  Legend
+                </label>{" "}
+                <RichTextEditor
+                  value={form.desc}
+                  onChange={(val) => setForm({ ...form, desc: val })}
+                  placeholder="The myths say..."
+                />{" "}
+              </div>{" "}
+            </div>{" "}
           </div>
         );
       };
